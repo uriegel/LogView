@@ -1,20 +1,30 @@
 {
-  "name": "logview",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
-  },
-  "dependencies": {
-    "vue": "^2.6.10",
-    "vuex": "^3.1.2"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-typescript": "^4.1.0",
-    "@vue/cli-plugin-vuex": "^4.1.0",
-    "@vue/cli-service": "^4.1.0",
-    "typescript": "~3.7.3",
-    "vue-template-compiler": "^2.6.10"
-  }
+	"name": "logview",
+	"version": "0.1.0",
+	"private": true,
+	"main": "electron/dist/main.js",
+	"scripts": {
+		"electron-build": "tsc -p electron",
+		"dev": "cross-env NODE_ENV=DEV vue-cli-service serve && electron electron/dist/main.js",
+		"electron": "cross-env NODE_ENV=DEV electron electron/dist/main.js",
+		"electron-prod": "electron electron/dist/main.js",
+		"build": "vue-cli-service build --modern",
+		"dist": "build -w --x64 --ia32"
+	},
+	"dependencies": {
+		"electron-settings": "^3.2.0",
+		"vue": "^2.6.10",
+		"vuex": "^3.1.2"
+	},
+	"devDependencies": {
+		"@types/node": "12.12.6",
+		"@types/electron-settings": "^3.1.1",
+		"@vue/cli-plugin-typescript": "^4.1.0",
+		"@vue/cli-plugin-vuex": "^4.1.0",
+		"@vue/cli-service": "^4.1.0",
+		"electron": "^8.0.0",
+		"cross-env": "^7.0.0",
+		"typescript": "~3.7.5",
+		"vue-template-compiler": "^2.6.10"
+	}
 }
