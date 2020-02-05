@@ -13,8 +13,10 @@
 	},
 	"dependencies": {
 		"electron-settings": "^3.2.0",
+		"gtk-utils": "^2.0.2",
 		"vue": "^2.6.10",
-		"vuex": "^3.1.2"
+		"vuex": "^3.1.2",
+		"windows-theme-changes": "^2.0.2"
 	},
 	"devDependencies": {
 		"@types/node": "12.12.6",
