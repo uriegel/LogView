@@ -1,15 +1,25 @@
 <template>
     <div id="app">
-        Affenkopf
+        <!-- <columns-test></columns-test> -->
+        <!-- <scrollbar-test></scrollbar-test> -->
+        <table-view-test></table-view-test>
     </div>
 </template>
 
 <script lang="ts">
-    import Vue from 'vue';
+import Vue from 'vue'
+// Tests
+// import ColumnsTest from './components/test/ColumnsTest.vue'
+// import ScrollbarTest from './components/test/ScrollbarTest.vue'
+import TableViewTest from './components/test/TableViewTest.vue'
 
 export default Vue.extend({
     name: 'app',
     components: {
+        // Tests:
+        //ColumnsTest,
+        // ScrollbarTest,
+        TableViewTest,
     }
 });
 </script>
