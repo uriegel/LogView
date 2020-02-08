@@ -4,7 +4,6 @@
 	"private": true,
 	"main": "electron/dist/main.js",
 	"scripts": {
-		"server": "dotnet build Server",
 		"dev": "cross-env NODE_ENV=DEV vue-cli-service serve && electron electron/dist/main.js",
 		"electron-build": "tsc -p electron",
 		"electron": "cross-env NODE_ENV=DEV electron electron/dist/main.js",
