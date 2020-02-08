@@ -1,6 +1,7 @@
 <template>
     <div class="root">
         <h1>Table View Test</h1>
+        <button @click=onClick>TEst</button>
         <div class="container">
             <table-view :eventBus="tableEventBus" :columns='columns' :items='items' :itemHeight='16'
                 @selection-changed="onSelectionChanged">
@@ -61,6 +62,26 @@ export default Vue.extend({
     },
     methods: {
         onSelectionChanged(index: number) { this.selectedIndex = index },
+        async onClick(evt: Event) {
+            function testRequest() {
+                return invoke("runOperation", { id: "ID Test", name: "Uwe Riegel" })
+            }
+
+            function invoke(method: string, param: any) {
+                return new Promise((resolve, reject) => {
+                    var xmlhttp = new XMLHttpRequest()
+                    xmlhttp.onload = evt => {
+                        var result = JSON.parse(xmlhttp.responseText)
+                        resolve(result)
+                    }
+                    xmlhttp.open('POST', `http://localhost:20000/testreq/${method}`, true)
+                    xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=utf-8')
+                    xmlhttp.send(JSON.stringify(param))
+                })
+            }
+
+            await testRequest()
+        },
         onChange(evt: Event) {
             const count = parseInt((evt.srcElement as HTMLInputElement).value)
             this.fillItems(count)
