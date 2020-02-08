@@ -1,10 +1,11 @@
 module Requests
 
 open System.IO
+open System.Text
 
-type private Line = {
+type Line = {
     pos: int64
-    length: int64
+    length: int
 }
 
 let mutable private logFile = None //: Some FileStream
@@ -35,7 +36,7 @@ let loadLogFile path =
                 Some (0L  // Initial state
                     |> Seq.unfold (fun state ->
                         match findChr buffer (int state) read (byte '\n') with
-                        | Some pos -> Some({ pos = state + fileOffset; length = (int64 pos - state - 1L) }, int64 (pos + 1))
+                        | Some pos -> Some({ pos = state + fileOffset; length = int (int64 pos - state - 1L) }, int64 (pos + 1))
                         | None -> None
                     )
                 )
@@ -50,3 +51,21 @@ let loadLogFile path =
         ret
 
     lineIndexes <- getLines () |> Seq.toArray
+
+let getLines (lines: int array) = 
+    let file = 
+        match logFile with
+        | Some value -> value
+        | _ -> failwith "File not opened"
+
+    let buffer = Array.zeroCreate 200000    
+    let getString startPos length =
+        file.Position <- startPos
+        file.Read (buffer, 0, length) |> ignore
+        Encoding.UTF8.GetString (buffer, 0, length)
+
+    let indexes = 
+        lines |> Seq.map (fun n -> lineIndexes.[n] )
+    indexes 
+    |> Seq.map (fun n -> getString n.pos n.length)
+    

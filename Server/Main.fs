@@ -3,11 +3,10 @@ open Session
 open Request
 open Requests
 
-type LineCount = { Lines: int }
-
-type PathInput = {
-    Path: string
-}
+type LineCount = { LineCount: int }
+type PathInput = { Path: string }
+type LinesInput = { LineIndexes: int array }
+type LinesReponse = { Lines: string seq }
 
 let asyncRequest (requestSession: RequestSession) = 
     async {
@@ -16,7 +15,12 @@ let asyncRequest (requestSession: RequestSession) =
         | "loadLogFile" -> 
             let input = asyncGetJson<PathInput> requestSession.requestData
             loadLogFile input.Path
-            let res = { Lines = getLineCount () }
+            let res = { LineCount = getLineCount () }
+            do! requestSession.asyncSendJson (res :> obj)
+            return true
+        | "getLines" ->
+            let input = asyncGetJson<LinesInput> requestSession.requestData
+            let res = { Lines = getLines input.LineIndexes }
             do! requestSession.asyncSendJson (res :> obj)
             return true
         | _ -> return false

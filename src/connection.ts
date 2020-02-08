@@ -2,6 +2,10 @@ export function loadLogFile(path: string) {
     return invoke("loadLogFile", { path })
 }
 
+export function getLines(lineIndexes: number[]) {
+    return invoke("getLines", { lineIndexes })
+}
+
 function invoke(method: string, param: any) {
     return new Promise((resolve, _) => {
         var xmlhttp = new XMLHttpRequest()
