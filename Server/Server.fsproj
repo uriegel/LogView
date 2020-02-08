@@ -4,11 +4,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="requests.fs"/>
-    <Compile Include="Main.fs"/>
+    <Compile Include="requests.fs" />
+    <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="UwebServer" Version="1.0.0"/>
-    <PackageReference Include="FSharpTools" Version="*"/>
+    <PackageReference Include="UwebServer" Version="1.0.0" />
+    <PackageReference Include="FSharpTools" Version="1.1.1" />
   </ItemGroup>
 </Project>

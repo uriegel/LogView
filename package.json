@@ -5,7 +5,7 @@
 	"main": "electron/dist/main.js",
 	"scripts": {
 		"server": "dotnet build Server",
-		"server-run": "dotnet build release Server &&",
+		"server-run": "dotnet build -c Release Server && Server/bin/Release/netcoreapp3.1/Server",
 		"dev": "cross-env NODE_ENV=DEV vue-cli-service serve && electron electron/dist/main.js",
 		"electron-build": "tsc -p electron",
 		"electron": "cross-env NODE_ENV=DEV electron electron/dist/main.js",
