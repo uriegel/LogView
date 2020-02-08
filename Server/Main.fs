@@ -1,52 +1,23 @@
 ﻿module Main
-open System.Runtime.Serialization
 open Session
+open Request
 open Requests
 
-[<DataContract>]
-type Command = {
-    [<DataMember>]
-    mutable cmd: string
+type LineCount = { Lines: int }
 
-    [<DataMember>]
-    mutable requestId: string
-
-    [<DataMember>]
-    mutable count: int64
-}
-
-[<DataContract>]
 type PathInput = {
-    [<DataMember>]
-    mutable path: string
+    Path: string
 }
 
 let asyncRequest (requestSession: RequestSession) = 
     async {
-
-
-
-// public static T Deserialize<T>(Stream s)
-// {
-//     using (StreamReader reader = new StreamReader(s))
-//     using (JsonTextReader jsonReader = new JsonTextReader(reader))
-//     {
-//         JsonSerializer ser = new JsonSerializer();
-//         return ser.Deserialize<T>(jsonReader);
-//     }
-// }
-
         let method = requestSession.url.Substring(requestSession.url.LastIndexOf('/') + 1) 
         match method with
         | "loadLogFile" -> 
-            let input = requestSession.asyncGetJson typedefof<PathInput> :?> PathInput
-            loadLogFile input.path
-            let command = {
-                cmd = "Kommando"
-                requestId = "RekwestEidie"
-                count = 2234335L
-            }
-            do! requestSession.asyncSendJson (command :> obj)            
+            let input = asyncGetJson<PathInput> requestSession.requestData
+            loadLogFile input.Path
+            let res = { Lines = getLineCount () }
+            do! requestSession.asyncSendJson (res :> obj)
             return true
         | _ -> return false
     }
@@ -75,18 +46,6 @@ type Test = {
 [<EntryPoint>]
 let main argv =
     try 
-        let test = { Path= "Der Pfad"; SubTest = { Name = "Der Name"; Id = 343 }; Vielleicht = Some "vielleicht"; Nichts = None }
-
-        use ms = new System.IO.MemoryStream()
-        Json.serializeStreamWithOptions ms test 
-        ms.Capacity <- int ms.Length
-        let buffer = ms.GetBuffer ()
-        let res = System.Text.Encoding.UTF8.GetString (buffer)
-
-        let buffer = System.Text.Encoding.UTF8.GetBytes (res)
-        use ms = new System.IO.MemoryStream (buffer)
-        let ress = Json.deserializeStreamWithOptions<Test> ms 
-
         let server = Server.create configuration 
         server.start ()
         stdin.ReadLine() |> ignore

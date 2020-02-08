@@ -10,6 +10,8 @@ type private Line = {
 let mutable private logFile = None //: Some FileStream
 let mutable private lineIndexes: (Line array) = [||]
 
+let getLineCount () = lineIndexes.Length
+
 let loadLogFile path = 
     logFile <- Some (File.OpenRead path)
     let file = 
