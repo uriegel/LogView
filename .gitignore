@@ -20,3 +20,6 @@ yarn-error.log*
 *.sln
 *.sw?
 /electron/dist
+.ionide/symbolCache.db
+Server/bin
+Server/obj

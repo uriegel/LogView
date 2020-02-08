@@ -68,7 +68,7 @@ export default Vue.extend({
             }
 
             function invoke(method: string, param: any) {
-                return new Promise((resolve, reject) => {
+     http://           return new Promise((resolve, reject) => {
                     var xmlhttp = new XMLHttpRequest()
                     xmlhttp.onload = evt => {
                         var result = JSON.parse(xmlhttp.responseText)
