@@ -25,6 +25,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import TableView, { TableViewItem } from '../controls/TableView.vue'
+import { loadLogFile } from '../../connection'
 
 export default Vue.extend({
     components: {
@@ -63,24 +64,7 @@ export default Vue.extend({
     methods: {
         onSelectionChanged(index: number) { this.selectedIndex = index },
         async onClick(evt: Event) {
-            function testRequest() {
-                return invoke("runOperation", { id: "ID Test", name: "Uwe Riegel" })
-            }
-
-            function invoke(method: string, param: any) {
-     http://           return new Promise((resolve, reject) => {
-                    var xmlhttp = new XMLHttpRequest()
-                    xmlhttp.onload = evt => {
-                        var result = JSON.parse(xmlhttp.responseText)
-                        resolve(result)
-                    }
-                    xmlhttp.open('POST', `http://localhost:20000/testreq/${method}`, true)
-                    xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=utf-8')
-                    xmlhttp.send(JSON.stringify(param))
-                })
-            }
-
-            await testRequest()
+            await loadLogFile("/home/uwe/server.log")
         },
         onChange(evt: Event) {
             const count = parseInt((evt.srcElement as HTMLInputElement).value)
