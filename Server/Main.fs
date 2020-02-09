@@ -6,23 +6,30 @@ open Requests
 type LineCount = { LineCount: int }
 type PathInput = { Path: string }
 type LinesInput = { LineIndexes: int array }
-type LinesReponse = { Lines: string seq }
 
 let asyncRequest (requestSession: RequestSession) = 
     async {
-        let method = requestSession.url.Substring(requestSession.url.LastIndexOf('/') + 1) 
-        match method with
+        let query = requestSession.query.Value
+        match query.method with
         | "loadLogFile" -> 
-            let input = asyncGetJson<PathInput> requestSession.requestData
-            loadLogFile input.Path
-            let res = { LineCount = getLineCount () }
-            do! requestSession.asyncSendJson (res :> obj)
-            return true
+            match query.Query "path" with
+            | Some path -> 
+                loadLogFile path
+                let res = { LineCount = getLineCount () }
+                do! requestSession.asyncSendJson (res :> obj)
+                return true
+            | None -> 
+                failwith "no path"
+                return false
         | "getLines" ->
-            let input = asyncGetJson<LinesInput> requestSession.requestData
-            let res = { Lines = getLines input.LineIndexes }
-            do! requestSession.asyncSendJson (res :> obj)
-            return true
+            match (query.Query "startRange", query.Query "endRange") with
+            | (Some startRange, Some endRange) -> 
+                let res = getLines (int startRange) (int endRange) 
+                do! requestSession.asyncSendJson (res :> obj)
+                return true
+            | _ -> 
+                failwith "no path"
+                return false
         | _ -> return false
     }
 

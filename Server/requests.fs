@@ -8,6 +8,11 @@ type Line = {
     length: int
 }
 
+type LineItem = {
+    Index: int
+    Text: string
+}
+
 let mutable private logFile = None //: Some FileStream
 let mutable private lineIndexes: (Line array) = [||]
 
@@ -52,7 +57,7 @@ let loadLogFile path =
 
     lineIndexes <- getLines () |> Seq.toArray
 
-let getLines (lines: int array) = 
+let getLines startIndex endIndex = 
     let file = 
         match logFile with
         | Some value -> value
@@ -64,8 +69,10 @@ let getLines (lines: int array) =
         file.Read (buffer, 0, length) |> ignore
         Encoding.UTF8.GetString (buffer, 0, length)
 
-    let indexes = 
-        lines |> Seq.map (fun n -> lineIndexes.[n] )
-    indexes 
-    |> Seq.map (fun n -> getString n.pos n.length)
+    let endIndex = if endIndex < lineIndexes.Length then endIndex else lineIndexes.Length - 1
+    seq { for i in startIndex .. endIndex -> (lineIndexes.[i], i) }
+    |> Seq.map (fun (n, i) -> {
+            Index = i
+            Text = getString n.pos n.length
+        })
     

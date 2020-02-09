@@ -27,7 +27,7 @@ const createWindow = function() {
     const isLightMode = theme == Themes.LinuxLight || theme == Themes.WindowsLight
     b.backgroundColor = isLightMode ? "#fff" : "#1e1e1e" 
     bounds.webPreferences = {
-        //preload: path.join(__dirname, 'preload.js'),
+        preload: path.join(__dirname, 'preload.js'),
         nodeIntegration: true
     }        
     

@@ -1,9 +1,29 @@
-export function loadLogFile(path: string) {
-    return invoke("loadLogFile", { path })
+export interface LineItem {
+    index: number,
+    text: string
 }
 
-export function getLines(lineIndexes: number[]) {
-    return invoke("getLines", { lineIndexes })
+export async function loadLogFile(path: string) {
+    const res = await invokeGetString("loadLogFile", { path })
+    const lines = JSON.parse(res) as any
+    return Number.parseInt(lines.lineCount)
+}
+
+export async function getLines(startRange: number, endRange: number) {
+    const res = await invokeGetString("getLines", { startRange, endRange })
+    return JSON.parse(res) as LineItem[]
+}
+
+function invokeGetString(method: string, params: any) {
+    return new Promise<string>((resolve, _) => {
+        const url = new URL(`${urlBase}/request/${method}`)
+        url.search = new URLSearchParams(params).toString()
+
+        var xmlhttp = new XMLHttpRequest()
+        xmlhttp.onload = _ => resolve(xmlhttp.responseText)
+        xmlhttp.open('GET', url.toString(), true)
+        xmlhttp.send()
+    })
 }
 
 function invoke(method: string, param: any) {
