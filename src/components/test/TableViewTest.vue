@@ -13,7 +13,7 @@
         </div>
         <div class="input">
             <button @click="fill">Fill</button>
-            <div>Message is: {{ totalCount }}</div>
+            <div>Zeilen: {{ totalCount }}</div>
         </div>    
     </div>
 </template>
@@ -49,7 +49,8 @@ export default Vue.extend({
         onSelectionChanged(index: number) { this.selectedIndex = index },
         async fill(evt: Event) {
             //const count = await loadLogFile("/home/uwe/server.log")
-            const count = await loadLogFile("D:\\Projekte\\LogReader\\LogReader\\server.log")
+            //const count = await loadLogFile("D:\\Projekte\\LogReader\\LogReader\\server.log")
+            const count = await loadLogFile("c:\\neuer ordner\\server.log")
             this.itemsSource = { count, getItems: getLines }
         },
         // fillItems(count: number) {
