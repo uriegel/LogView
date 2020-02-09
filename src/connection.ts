@@ -20,6 +20,12 @@ export async function getLines(startRange: number, endRange: number) {
     return JSON.parse(res) as LineItem[]
 }
 
+export async function scanFile() {
+    const res = await invokeGetString("scanFile", null)
+    const test = JSON.parse(res) 
+    console.log(test)
+}
+
 function invokeGetString(method: string, params: any) {
     return new Promise<string>((resolve, _) => {
         const url = new URL(`${urlBase}/request/${method}`)

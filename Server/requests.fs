@@ -95,3 +95,16 @@ let getLines startIndex endIndex =
             Text = getString n.pos n.length
         })
     
+let scanFile () =
+    let file = accessfile false
+    let buffer = Array.zeroCreate 200000    
+    let getString startPos length =
+        file.Position <- startPos
+        file.Read (buffer, 0, length) |> ignore
+
+//*(lineIndexes.Length - 1)*/
+    seq { for i in 40000 .. 400000 -> (lineIndexes.[i], i) }
+    |> Seq.map (fun (n, i) -> 
+            getString n.pos n.length
+            i)
+    |> Seq.toArray

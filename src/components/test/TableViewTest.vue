@@ -14,6 +14,7 @@
         <div class="input">
             <button @click="fill">Fill</button>
             <button @click="refresh">Refresh</button>
+            <button @click="scanFile">Scan</button>
             <div>Zeilen: {{ totalCount }}</div>
         </div>    
     </div>
@@ -22,7 +23,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import TableView, { TableViewItem, ItemsSource } from '../controls/TableView.vue'
-import { loadLogFile, getLines, refresh } from '../../connection'
+import { loadLogFile, getLines, refresh, scanFile } from '../../connection'
 
 export default Vue.extend({
     components: {
@@ -49,8 +50,8 @@ export default Vue.extend({
     methods: {
         onSelectionChanged(index: number) { this.selectedIndex = index },
         async fill(evt: Event) {
-            //const count = await loadLogFile("/home/uwe/server.log")
-            const count = await loadLogFile("/home/uwe/Desktop/LogTest/test.log")
+            const count = await loadLogFile("/home/uwe/server.log")
+            //const count = await loadLogFile("/home/uwe/Desktop/LogTest/test.log")
             //const count = await loadLogFile("D:\\Projekte\\LogReader\\LogReader\\server.log")
             //const count = await loadLogFile("c:\\neuer ordner\\server.log")
             this.itemsSource = { count, getItems: getLines }
@@ -59,6 +60,9 @@ export default Vue.extend({
             const count = await refresh()
             console.log("Refresht", count)
             this.itemsSource = { count, getItems: getLines }
+        },
+        async scanFile(evt: Event) {
+            await scanFile()
         }
     }
 })

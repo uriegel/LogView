@@ -34,6 +34,11 @@ let asyncRequest (requestSession: RequestSession) =
             let res = { LineCount = refresh () }
             do! requestSession.asyncSendJson (res :> obj)
             return true
+
+        | "scanFile" -> 
+            let res = scanFile ()
+            do! requestSession.asyncSendJson ("res" :> obj)
+            return true
         | _ -> return false
     }
 
