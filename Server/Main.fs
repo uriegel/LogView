@@ -10,7 +10,7 @@ type LinesInput = { LineIndexes: int array }
 let asyncRequest (requestSession: RequestSession) = 
     async {
         let query = requestSession.query.Value
-        match query.method with
+        match query.Method with
         | "loadLogFile" -> 
             match query.Query "path" with
             | Some path -> 

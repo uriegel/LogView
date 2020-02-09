@@ -48,9 +48,9 @@ export default Vue.extend({
     methods: {
         onSelectionChanged(index: number) { this.selectedIndex = index },
         async fill(evt: Event) {
-            //const count = await loadLogFile("/home/uwe/server.log")
+            const count = await loadLogFile("/home/uwe/server.log")
             //const count = await loadLogFile("D:\\Projekte\\LogReader\\LogReader\\server.log")
-            const count = await loadLogFile("c:\\neuer ordner\\server.log")
+            //const count = await loadLogFile("c:\\neuer ordner\\server.log")
             this.itemsSource = { count, getItems: getLines }
         },
         // fillItems(count: number) {
