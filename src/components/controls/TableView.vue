@@ -66,8 +66,11 @@ export default Vue.extend({
                 // if (this.itemsSource.count)
                 //     this.items[0].isCurrent = true
 //                this.items.forEach((n, i) => n.index = i)                    
-                this.index = 0
+                this.index = newVal.count - 1
+                this.setCurrentIndex(this.index)
+                this.end()                
                 this.onResize()
+                setTimeout(() => this.scrollIntoView(), 20)
             }
         },
         position(newVal) { 

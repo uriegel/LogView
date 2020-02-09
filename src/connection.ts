@@ -9,6 +9,12 @@ export async function loadLogFile(path: string) {
     return Number.parseInt(lines.lineCount)
 }
 
+export async function refresh() {
+    const res = await invokeGetString("refresh", null)
+    const lines = JSON.parse(res) as any
+    return Number.parseInt(lines.lineCount)
+}
+
 export async function getLines(startRange: number, endRange: number) {
     const res = await invokeGetString("getLines", { startRange, endRange })
     return JSON.parse(res) as LineItem[]
@@ -17,7 +23,8 @@ export async function getLines(startRange: number, endRange: number) {
 function invokeGetString(method: string, params: any) {
     return new Promise<string>((resolve, _) => {
         const url = new URL(`${urlBase}/request/${method}`)
-        url.search = new URLSearchParams(params).toString()
+        if (params)
+            url.search = new URLSearchParams(params).toString()
 
         var xmlhttp = new XMLHttpRequest()
         xmlhttp.onload = _ => resolve(xmlhttp.responseText)

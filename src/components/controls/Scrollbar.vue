@@ -42,7 +42,7 @@ export default Vue.extend({
             this.position = newVal
         },
         totalCount: function (newVal: number, oldVal: number) {
-            this.setPosition(0)
+            //this.setPosition(0)
         }
     },
     computed: {

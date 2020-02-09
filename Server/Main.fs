@@ -30,6 +30,10 @@ let asyncRequest (requestSession: RequestSession) =
             | _ -> 
                 failwith "no path"
                 return false
+        | "refresh" ->
+            let res = { LineCount = refresh () }
+            do! requestSession.asyncSendJson (res :> obj)
+            return true
         | _ -> return false
     }
 

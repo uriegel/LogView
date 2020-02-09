@@ -13,17 +13,19 @@ type LineItem = {
     Text: string
 }
 
-let mutable private logFile = None //: Some FileStream
 let mutable private lineIndexes: (Line array) = [||]
+let mutable private path = ""
+let mutable fileSize = 0L
 
 let getLineCount () = lineIndexes.Length
 
-let loadLogFile path = 
-    logFile <- Some (File.OpenRead path)
-    let file = 
-        match logFile with
-        | Some value -> value
-        | _ -> failwith "File not opened"
+let private accessfile adjustLength = 
+    let file = File.OpenRead path
+    if adjustLength then
+        fileSize <-file.Length
+    file
+
+let private createLogIndexes (file: FileStream) =
     let buffer = Array.zeroCreate 200000
 
     let getLines () =
@@ -55,14 +57,31 @@ let loadLogFile path =
                 | None -> None) |> Seq.concat
         ret
 
-    lineIndexes <- getLines () |> Seq.toArray
+    getLines ()
+
+let loadLogFile logFilePath = 
+    path <- logFilePath
+    lineIndexes <-
+        accessfile true 
+        |> createLogIndexes 
+        |> Seq.toArray
+
+let refresh () = 
+    let recentFileSize = fileSize
+    let file = accessfile true 
+    file.Position <- recentFileSize
+    let newLines =
+        file 
+        |> createLogIndexes
+        |> Seq.toArray
+    lineIndexes <- 
+        [| lineIndexes; newLines |] 
+        |> Seq.concat 
+        |> Seq.toArray
+    lineIndexes.Length
 
 let getLines startIndex endIndex = 
-    let file = 
-        match logFile with
-        | Some value -> value
-        | _ -> failwith "File not opened"
-
+    let file = accessfile false
     let buffer = Array.zeroCreate 200000    
     let getString startPos length =
         file.Position <- startPos

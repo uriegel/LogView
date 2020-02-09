@@ -13,6 +13,7 @@
         </div>
         <div class="input">
             <button @click="fill">Fill</button>
+            <button @click="refresh">Refresh</button>
             <div>Zeilen: {{ totalCount }}</div>
         </div>    
     </div>
@@ -21,7 +22,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import TableView, { TableViewItem, ItemsSource } from '../controls/TableView.vue'
-import { loadLogFile, getLines } from '../../connection'
+import { loadLogFile, getLines, refresh } from '../../connection'
 
 export default Vue.extend({
     components: {
@@ -48,28 +49,17 @@ export default Vue.extend({
     methods: {
         onSelectionChanged(index: number) { this.selectedIndex = index },
         async fill(evt: Event) {
-            const count = await loadLogFile("/home/uwe/server.log")
+            //const count = await loadLogFile("/home/uwe/server.log")
+            const count = await loadLogFile("/home/uwe/Desktop/LogTest/test.log")
             //const count = await loadLogFile("D:\\Projekte\\LogReader\\LogReader\\server.log")
             //const count = await loadLogFile("c:\\neuer ordner\\server.log")
             this.itemsSource = { count, getItems: getLines }
         },
-        // fillItems(count: number) {
-        //     this.items = []
-        //     Array.from(Array(count).keys()).map((n, i) => {
-        //         return {
-        //             name: `name ${i}`,
-        //             extension: `extension ${i}`,
-        //             date: `datum ${i}`,
-        //             description: `description ${i}`,
-        //             isCurrent: false,
-        //             index: i
-        //         }
-        //     }).forEach((n, i) => this.items[i] = n)
-        //     this.tableEventBus.$emit("focus")
-        // }
-    },
-    mounted() {
-        //setTimeout(() => this.tableEventBus.$emit("focus"))
+        async refresh(evt: Event) {
+            const count = await refresh()
+            console.log("Refresht", count)
+            this.itemsSource = { count, getItems: getLines }
+        }
     }
 })
 </script>
