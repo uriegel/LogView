@@ -2,7 +2,7 @@
     <div class="root">
         <h1>Table View Test</h1>
         <div class="container">
-            <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource' :itemHeight='17'
+            <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource' :itemHeight='16'
                 @selection-changed="onSelectionChanged">
                 <template v-slot=row >
                     <tr :class="{ 'isCurrent': row.item.index == selectedIndex }">
@@ -50,16 +50,20 @@ export default Vue.extend({
     methods: {
         onSelectionChanged(index: number) { this.selectedIndex = index },
         async fill(evt: Event) {
-            const count = await loadLogFile("/home/uwe/server.log")
+            //const count = await loadLogFile("/home/uwe/server.log")
             //const count = await loadLogFile("/home/uwe/Desktop/LogTest/test.log")
-            //const count = await loadLogFile("D:\\Projekte\\LogReader\\LogReader\\server.log")
+            const count = await loadLogFile("D:\\Projekte\\LogReader\\LogReader\\server.log")
+            //const count = await loadLogFile("C:\\ProgramData\\caesar\\CAEWebSrv\\log\\caesarWebServer.log")
+            
             //const count = await loadLogFile("c:\\neuer ordner\\server.log")
             this.itemsSource = { count, getItems: getLines }
         },
         async refresh(evt: Event) {
-            const count = await refresh()
-            console.log("Refresht", count)
-            this.itemsSource = { count, getItems: getLines }
+            setInterval(async () => {
+                const count = await refresh()
+                console.log("Refresht", count)
+                this.itemsSource = { count, getItems: getLines }
+            }, 200)
         },
         async scanFile(evt: Event) {
             await scanFile()

@@ -20,7 +20,7 @@ let mutable fileSize = 0L
 let getLineCount () = lineIndexes.Length
 
 let private accessfile adjustLength = 
-    let file = File.OpenRead path
+    let file = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
     if adjustLength then
         fileSize <-file.Length
     file
