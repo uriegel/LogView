@@ -1,8 +1,7 @@
 <template>
     <div class="root">
-        <h1>Table View Test</h1>
         <div class="container">
-            <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource' :itemHeight='17'
+            <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'      :itemHeight='17'
                 @selection-changed="onSelectionChanged">
                 <template v-slot=row >
                     <tr :class="{ 'isCurrent': row.item.index == selectedIndex }">
@@ -22,7 +21,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import TableView, { TableViewItem, ItemsSource } from '../controls/TableView.vue'
+import TableView, { TableViewItem, ItemsSource } from './TableView.vue'
 import { loadLogFile, getLines, refresh, scanFile } from '../../connection'
 
 export default Vue.extend({

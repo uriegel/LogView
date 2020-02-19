@@ -1,28 +1,17 @@
 <template>
     <div id="app">
-        <!-- <columns-test></columns-test> -->
-        <!-- <scrollbar-test></scrollbar-test> -->
-        <table-view-test></table-view-test>
-        <!-- <connection-test></connection-test> -->
+        <log-view></log-view>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-// Tests
-// import ColumnsTest from './components/test/ColumnsTest.vue'
-// import ScrollbarTest from './components/test/ScrollbarTest.vue'
-import TableViewTest from './components/test/TableViewTest.vue'
-// import ConnectionTest from './components/test/ConnectionTest.vue'
+import LogView from './components/controls/LogView.vue'
 
 export default Vue.extend({
     name: 'app',
     components: {
-        // Tests:
-        // ColumnsTest,
-        // ScrollbarTest,
-         TableViewTest,
-        //ConnectionTest,
+         LogView,
     }
 });
 </script>
