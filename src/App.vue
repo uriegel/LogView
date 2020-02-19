@@ -18,38 +18,32 @@ export default Vue.extend({
 
 <style>
 :root {
-    --main-color: black;
-    --main-background-color: white;
-    --font-size: 75%;
-    --selected-background-color: blue;
-    --selected-background-hover-color: #0063ff;
-    --selected-color: white;
-    --columns-separator-color: white;
-    --scrollbar-top: 16px;
-    --scrollbar-border-color: var(--vue-electron-titlebar-button-hover-color);
-    --scrollbar-grip-color: rgb(209, 209, 209);
-    --scrollbar-button-active-color: #aaa;
-    --scrollbar-image-color: #666;
-    --scrollbar-border-active-color: #444;
-    --scrollbar-grip-color: rgb(209, 209, 209);
-    --scrollbar-grip-hover-color: #bbb;
-    --scrollbar-grip-active-color: #999;
-    --status-height: 14px;
-    --tr-selected-color: red;
-    --grip-color: var(--vue-electron-titlebar-background-color);
-    --icon-color: black;
-    --icon-selected-color: white;
-    --dialog-background-color: white;
-    --dialog-fader-color: rgba(0, 0, 0, 0.50);
-    --dialog-input-border-color: #grey;
-    --dialog-input-outline-color: blue;
-    --drag-highlight: aqua;
+    --tablevue-main-color: black;
+    --tablevue-main-background-color: white;
+    --tablevue-font-size: 75%;
+    --tablevue-selected-background-color: blue;
+    --tablevue-selected-background-hover-color: #0063ff;
+    --tablevue-selected-color: white;
+    --tablevue-columns-separator-color: white;
+    --tablevue-scrollbar-top: 16px;
+    --tablevue-scrollbar-border-color: var(--vue-electron-titlebar-button-hover-color);
+    --tablevue-scrollbar-grip-color: rgb(209, 209, 209);
+    --tablevue-scrollbar-button-active-color: #aaa;
+    --tablevue-scrollbar-image-color: #666;
+    --tablevue-scrollbar-border-active-color: #444;
+    --tablevue-scrollbar-grip-color: rgb(209, 209, 209);
+    --tablevue-scrollbar-grip-hover-color: #bbb;
+    --tablevue-scrollbar-grip-active-color: #999;
+    --tablevue-tr-selected-color: red;
+    --tablevue-grip-color: var(--vue-electron-titlebar-background-color);
+    --tablevue-icon-color: black;
+    --tablevue-icon-selected-color: white;
 } 
 body {
-    background-color: var(--main-background-color);
-    color: var(--main-color);
+    background-color: var(--tablevue-main-background-color);
+    color: var(--tablevue-main-color);
     font-family: sans-serif;
-    font-size: var(--font-size);
+    font-size: var(--tablevue-font-size);
     overflow:hidden;
     height: 100vh;
     padding: 0px;
