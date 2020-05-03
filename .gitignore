@@ -23,3 +23,10 @@ yarn-error.log*
 .ionide/symbolCache.db
 Server/bin
 Server/obj
+
+.fake
+.ionide
+Server/linux/LogView/obj
+Server/windows/LogView/obj
+Server/linux/LogView/bin
+Server/windows/LogView/bin/
