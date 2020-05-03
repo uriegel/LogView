@@ -1,16 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-    	<OutputType>Exe</OutputType>
-    	<TargetFramework>netcoreapp3.1</TargetFramework>
-	</PropertyGroup>
-  	
-	<ItemGroup>
-  		<Compile Include="requests.fs" />
-   		<Compile Include="Main.fs" />
-  	</ItemGroup>
-
-  	<ItemGroup>
-    	<PackageReference Include="UwebServer" Version="2.0.0" />
-    	<PackageReference Include="FSharpTools" Version="1.2.0" />
-  	</ItemGroup>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Globals.fs" />
+    <Compile Include="requests.fs" />
+    <Compile Include="Settings.fs" />
+    <Compile Include="Main.fs" />
+    <Compile Include="WebServer.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="UwebServer" Version="4.2.2" />
+    <PackageReference Include="FSharpTools" Version="2.3.3" />
+    <PackageReference Include="UwebStatic" Version="1.2.0" />
+    <PackageReference Include="UwebSocket" Version="3.0.0" />
+    <PackageReference Include="NewtonSoft.Json" Version="12.0.3" />
+  </ItemGroup>
 </Project>

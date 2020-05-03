@@ -1,8 +1,7 @@
-﻿// Learn more about F# at http://fsharp.org
+﻿open System
+open System.IO
 
-open System
+if Environment.CurrentDirectory.Contains "netcoreapp" then
+    Environment.CurrentDirectory <- Path.Combine (Environment.CurrentDirectory, "../../../../")
 
-[<EntryPoint>]
-let main argv =
-    printfn "Hello World from F#!"
-    0 // return an integer exit code
+Mainwindow.run ()
