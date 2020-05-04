@@ -15,6 +15,7 @@ let run () =
         let builder = Builder.New ()
         Builder.AddFromFile (builder, "Server/app.glade", IntPtr.Zero) |> ignore
         let window = Builder.GetObject (builder, "window")
+        let headerBar = Builder.GetObject (builder, "header")
         GObject.Unref builder
         let webView = WebKit.New ()
 
@@ -22,18 +23,37 @@ let run () =
             let context = WebKitContext.GetDefault ()
             WebKitContext.ClearCache context
 
-//         let actions = [
-//             GtkAction ("destroy", (fun () -> Application.Quit app), "<Ctrl>Q")  
-//             GtkAction("showhidden", false, showHidden, "<Ctrl>H")                   
-//             GtkAction("refresh", refresh, "<Ctrl>R")                   
-// #if DEBUG            
-//             GtkAction ("test", test, "<Ctrl>T") 
-//             GtkAction ("devtools", (fun () -> WebKit.RunJavascript (webView, "alert('devTools')") |> ignore), "F12")         
-// #endif            
-//             GtkAction ("clearCache", clearCache, "<Ctrl><Shift>Delete") 
+        let openFile file = 
+            HeaderBar.SetSubtitle (headerBar, file)
+
+        let chooseFile () =
+            let dialog = Dialog.NewFileChooser ("Datei öffnen", window, Dialog.FileChooserAction.Open, "_Abbrechen", Dialog.ResponseId.Cancel, "_Öffnen", Dialog.ResponseId.Ok, IntPtr.Zero)
+            let res = Dialog.Run dialog
+            if res = Dialog.ResponseId.Ok then
+                let ptr = Dialog.FileChooserGetFileName dialog
+                let file = Marshal.PtrToStringUTF8 ptr
+                openFile file
+                GObject.Free ptr
+            Widget.Destroy dialog
+
+        let onDropFiles (w: nativeint) context x y (data: nativeint) = 
+            let files = 
+                SelectionData.GetText data
+                |> String.splitChar '\n'
+            let file = files.[0]
+            openFile file
+        
+        Gtk.SignalConnect (window, "drag-data-received", DropFilesFunc onDropFiles)            
+
+        let actions = [
+            GtkAction ("destroy", (fun () -> Application.Quit app), "<Ctrl>Q")  
+            GtkAction ("openfile", (fun () -> chooseFile ()), "<Ctrl>O")  
+#if DEBUG            
+            GtkAction ("devtools", (fun () -> WebKit.RunJavascript (webView, "alert('devTools')") |> ignore), "F12")         
+#endif            
 //             GtkAction ("themes", theme, changeTheme)
-//         ]
-//         Application.AddActions (app, actions)
+        ]
+        Application.AddActions (app, actions)
         
         let w = Settings.getDef<int> "Width" 600
         let h = Settings.getDef<int> "Height" 800

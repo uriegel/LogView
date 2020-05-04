@@ -7,7 +7,6 @@
     <Compile Include="Globals.fs" />
     <Compile Include="requests.fs" />
     <Compile Include="Settings.fs" />
-    <Compile Include="Main.fs" />
     <Compile Include="WebServer.fs" />
   </ItemGroup>
   <ItemGroup>
