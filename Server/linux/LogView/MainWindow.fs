@@ -25,6 +25,7 @@ let run () =
 
         let openFile file = 
             HeaderBar.SetSubtitle (headerBar, file)
+            LogView.loadLogFile file
 
         let chooseFile () =
             let dialog = Dialog.NewFileChooser ("Datei öffnen", window, Dialog.FileChooserAction.Open, "_Abbrechen", Dialog.ResponseId.Cancel, "_Öffnen", Dialog.ResponseId.Ok, IntPtr.Zero)
@@ -40,7 +41,7 @@ let run () =
             let files = 
                 SelectionData.GetText data
                 |> String.splitChar '\n'
-            let file = files.[0]
+            let file = files.[0] |> String.substring 7
             openFile file
         
         Gtk.SignalConnect (window, "drag-data-received", DropFilesFunc onDropFiles)            

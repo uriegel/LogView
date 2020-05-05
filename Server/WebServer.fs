@@ -2,12 +2,10 @@ module Webserver
 open System.IO
 open Websocket
 open Server
-open System.Text 
-open Session
 
 let start () = 
     let requests = [ 
-        useWebsocket "/logview" Server.initialize
+        useWebsocket "/logview" LogView.initialize
         Static.useStatic (Path.Combine (Directory.GetCurrentDirectory (), "renderer")) "/" 
     ]
 
