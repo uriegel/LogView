@@ -1,0 +1,36 @@
+:root {
+    --main-background-color: #2f2f2f;
+    --main-color: white;
+    --font-size: 85%;
+
+    --tablevue-main-color: white;
+    --tablevue-main-background-color: #2f2f2f;
+    --tablevue-right-margin-scrollbar: 6px;
+    
+    --tablevue-scrollbar-width: 12px;
+    --tablevue-scrollbar-border-width: 0px;
+    --tablevue-scrollbar-grip-radius: 999px;
+    --tablevue-scrollbar-button-display: none; 
+    --tablevue-scrollbar-background-color: transparent;
+    --tablevue-scrollbar-background-hover-color: #3f3f3f;
+    --tablevue-scrollbar-grip-color: gray;    
+    --tablevue-scrollbar-grip-hover-color: gray;    
+    --tablevue-scrollbar-grip-active-color: #e95420;    
+    --tablevue-scrollbar-grip-width: 4px;    
+    --tablevue-scrollbar-grip-right: 1px;    
+    --tablevue-scrollbar-button-color: #666;
+    --tablevue-scrollbar-button-hover-color: #555;
+    --tablevue-scrollbar-button-active-color: #444;
+    --tablevue-scrollbar-button-background-color: white;
+    --tablevue-scrollbar-button-hover-background-color: rgb(209, 209, 209);
+    --tablevue-scrollbar-button-active-background-color: #aaa;
+
+    --tablevue-selected-color:  #9b9b9b;
+    --tablevue-selected-background-color: #3f3f3f;
+    --tablevue-columns-separator-color:  #9b9b9b;
+    --tablevue-selected-background-hover-color: #545454;
+    --tablevue-tr-selected-color: #9b9b9b;
+
+    --icon-color: #999; 
+    --exif-color: orangered;
+}

@@ -17,37 +17,15 @@ export default Vue.extend({
 </script>
 
 <style>
-:root {
-    --tablevue-main-color: black;
-    --tablevue-main-background-color: white;
-    --tablevue-font-size: 75%;
-    --tablevue-selected-background-color: blue;
-    --tablevue-selected-background-hover-color: #0063ff;
-    --tablevue-selected-color: white;
-    --tablevue-columns-separator-color: white;
-    --tablevue-scrollbar-top: 16px;
-    --tablevue-scrollbar-border-color: var(--vue-electron-titlebar-button-hover-color);
-    --tablevue-scrollbar-grip-color: rgb(209, 209, 209);
-    --tablevue-scrollbar-button-active-color: #aaa;
-    --tablevue-scrollbar-image-color: #666;
-    --tablevue-scrollbar-border-active-color: #444;
-    --tablevue-scrollbar-grip-color: rgb(209, 209, 209);
-    --tablevue-scrollbar-grip-hover-color: #bbb;
-    --tablevue-scrollbar-grip-active-color: #999;
-    --tablevue-tr-selected-color: red;
-    --tablevue-grip-color: var(--vue-electron-titlebar-background-color);
-    --tablevue-icon-color: black;
-    --tablevue-icon-selected-color: white;
-} 
 body {
-    background-color: var(--tablevue-main-background-color);
-    color: var(--tablevue-main-color);
+    background-color: var(--main-background-color);
+    color: var(--main-color); 
+    font-size: var(--font-size);
     font-family: sans-serif;
-    font-size: var(--tablevue-font-size);
     overflow:hidden;
     height: 100vh;
     padding: 0px;
-    margin: 0px;
+    margin: 0px;    
 }
 #app {
     -webkit-font-smoothing: antialiased;

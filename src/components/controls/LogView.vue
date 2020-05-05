@@ -24,6 +24,14 @@ import Vue from 'vue'
 import {ItemsSource, Column, TableViewItem } from 'virtual-table-vue'
 import { loadLogFile, getLines, refresh, scanFile } from '../../connection'
 
+interface Message {
+  	method: string
+}
+
+interface ThemeMsg extends Message {
+  	theme: string
+}
+
 export default Vue.extend({
     data() {
         return {
@@ -41,6 +49,29 @@ export default Vue.extend({
     computed: {
         totalCount(): number {
             return this.itemsSource.count
+        }
+    },
+    mounted: function () {
+        const ws = new WebSocket("ws://localhost:9866/logview")
+        ws.onmessage = m => {
+            let msg = JSON.parse(m.data) as Message
+            switch (msg.method) {
+          	    case "changeTheme":
+				    const themeMsg = msg as ThemeMsg
+				    const styleSheet = document.getElementById("theme")  
+				    if (styleSheet)
+					    styleSheet.remove()
+
+	    			const head = document.getElementsByTagName('head')[0]
+				    let link = document.createElement('link')
+				    link.rel = 'stylesheet'
+				    link.id = 'theme'
+				    link.type = 'text/css'
+				    link.href = `http://localhost:9866/assets/themes/${themeMsg.theme}.css`
+				    link.media = 'all'
+				    head.appendChild(link)
+                    break    
+            }
         }
     },
     methods: {
