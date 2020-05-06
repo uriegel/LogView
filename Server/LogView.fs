@@ -1,5 +1,7 @@
 module LogView
 open System.IO
+open System
+open System.Runtime.InteropServices
 
 let mutable send = fun (payload: obj) -> ()
 
@@ -25,7 +27,7 @@ let private accessfile adjustLength =
     file
 
 let private createLogIndexes (file: FileStream) =
-    let buffer = Array.zeroCreate 200000
+    let buffer = Array.zeroCreate 20000
 
     let getLines () =
         let getLinesBuffer () =
@@ -58,7 +60,6 @@ let private createLogIndexes (file: FileStream) =
 
     getLines ()
 
-// TODO: use Span instead of byte array
 // TODO: use parallel 8 threads
 
 let loadLogFile logFilePath = 
