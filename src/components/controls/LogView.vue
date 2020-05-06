@@ -1,21 +1,13 @@
 <template>
     <div class="root">
-        <div class="container">
-            <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'  
-                @selection-changed="onSelectionChanged">
-                <template v-slot=row >
-                    <tr :class="{ 'isCurrent': row.item.index == selectedIndex }">
-                        <td>{{row.item.text}}</td>
-                    </tr>
-                </template>
-            </table-view>
-        </div>
-        <div class="input">
-            <button @click="fill">Fill</button>
-            <button @click="refresh">Refresh</button>
-            <button @click="scanFile">Scan</button>
-            <div>Zeilen: {{ totalCount }}</div>
-        </div>    
+        <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'  
+            @selection-changed="onSelectionChanged">
+            <template v-slot=row >
+                <tr :class="{ 'isCurrent': row.item.index == selectedIndex }">
+                    <td>{{row.item.text}}</td>
+                </tr>
+            </template>
+        </table-view>
     </div>
 </template>
 
@@ -32,6 +24,28 @@ interface ThemeMsg extends Message {
   	theme: string
 }
 
+interface NewItemsSource extends Message {
+    count: number,
+    indexToSelect: number
+}
+
+enum OutMsgType {
+    GetItems = "GetItems"
+}
+
+interface Range {
+    reqId: number
+    startRange: number, 
+    endRange: number
+}
+
+interface OutMsg {
+    case: OutMsgType
+    fields: Range[]
+}
+
+var reqId = 0
+
 export default Vue.extend({
     data() {
         return {
@@ -43,7 +57,11 @@ export default Vue.extend({
                     isSortable: true
                 }
             ],
-            itemsSource: { count: 0, getItems: async (_: number, __: number) => await []} as ItemsSource
+            itemsSource: { 
+                count: 0,
+                indexToSelect: 0,
+                getItems: async (_: number, __: number) => await []
+            } as ItemsSource
         }
     },
     computed: {
@@ -55,6 +73,18 @@ export default Vue.extend({
         const ws = new WebSocket("ws://localhost:9866/logview")
         ws.onmessage = m => {
             let msg = JSON.parse(m.data) as Message
+            let resolves = new Map<number, (items: any[])=>void>()
+            const getItems = async (startRange: number, endRange: number) => {
+                return new Promise<any[]>((res, rej) => {
+                    const msg: OutMsg = {
+                        case: OutMsgType.GetItems,
+                        fields: [{ reqId: ++reqId, startRange, endRange }]
+                    }
+                    resolves.set(reqId, res)
+                    ws.send(JSON.stringify(msg))
+                })
+            }
+
             switch (msg.method) {
           	    case "changeTheme":
 				    const themeMsg = msg as ThemeMsg
@@ -71,6 +101,14 @@ export default Vue.extend({
 				    link.media = 'all'
 				    head.appendChild(link)
                     break    
+                case "itemsSource":
+                    const itemsSource = msg as NewItemsSource
+                    this.itemsSource = { 
+                        count: itemsSource.count, 
+                        getItems, 
+                        indexToSelect: itemsSource.indexToSelect 
+                    }
+                    break
             }
         }
     },
@@ -83,13 +121,13 @@ export default Vue.extend({
             //const count = await loadLogFile("C:\\ProgramData\\caesar\\CAEWebSrv\\log\\caesarWebServer.log")
             
             //const count = await loadLogFile("c:\\neuer ordner\\server.log")
-            this.itemsSource = { count, getItems: getLines }
+            this.itemsSource = { count, indexToSelect: 0, getItems: getLines }
         },
         async refresh(evt: Event) {
             setInterval(async () => {
                 const count = await refresh()
                 console.log("Refresht", count)
-                this.itemsSource = { count, getItems: getLines }
+                this.itemsSource = { count, indexToSelect: 0, getItems: getLines }
             }, 200)
         },
         async scanFile(evt: Event) {

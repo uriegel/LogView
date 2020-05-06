@@ -60,14 +60,15 @@ let private createLogIndexes (file: FileStream) =
 
     getLines ()
 
-// TODO: use parallel 8 threads
-
 let loadLogFile logFilePath = 
-    printfn "Starte"
     path <- logFilePath
     lineIndexes <-
         accessfile true 
         |> createLogIndexes 
         |> Seq.toArray    
-    printfn "Fertig %d" lineIndexes.Length
+    send {| Method = "itemsSource"; Count = lineIndexes.Length; IndexToSelect = lineIndexes.Length - 1 |} 
+
+    // TODO: respond default theme
+    // TODO: getItems
+    // TODO: loadLogFile in background!
 
