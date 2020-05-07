@@ -8,6 +8,7 @@
     <Compile Include="requests.fs" />
     <Compile Include="Settings.fs" />
     <Compile Include="Model.fs" />
+    <Compile Include="FileOperations.fs" />
     <Compile Include="LogView.fs" />
     <Compile Include="WebServer.fs" />
   </ItemGroup>

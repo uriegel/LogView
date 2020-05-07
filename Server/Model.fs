@@ -1,4 +1,12 @@
 namespace Model
 open System
 
-type Method = | ItemsSource = 1
+type Method = 
+| ChangeTheme = 1
+| ItemsSource = 2  
+| Items = 3
+
+type LineItem = {
+    Index: int
+    Text: string
+}

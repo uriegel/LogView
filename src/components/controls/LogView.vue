@@ -16,15 +16,21 @@ import Vue from 'vue'
 import {ItemsSource, Column, TableViewItem } from 'virtual-table-vue'
 import { loadLogFile, getLines, refresh, scanFile } from '../../connection'
 
-interface Message {
-  	method: string
+enum InMsgType {
+    ChangeTheme = 1,
+    ItemsSource,
+    Items,
 }
 
-interface ThemeMsg extends Message {
+interface InMsg {
+    method: InMsgType
+}
+
+interface ThemeMsg extends InMsg {
   	theme: string
 }
 
-interface NewItemsSource extends Message {
+interface NewItemsSource extends InMsg {
     count: number,
     indexToSelect: number
 }
@@ -42,6 +48,13 @@ interface Range {
 interface OutMsg {
     case: OutMsgType
     fields: Range[]
+}
+
+interface Items extends InMsg {
+    reqId: number
+    path: string,
+    isHidden: boolean
+    items: any[]
 }
 
 var reqId = 0
@@ -72,7 +85,7 @@ export default Vue.extend({
     mounted: function () {
         const ws = new WebSocket("ws://localhost:9866/logview")
         ws.onmessage = m => {
-            let msg = JSON.parse(m.data) as Message
+            let msg = JSON.parse(m.data) as InMsg
             let resolves = new Map<number, (items: any[])=>void>()
             const getItems = async (startRange: number, endRange: number) => {
                 return new Promise<any[]>((res, rej) => {
@@ -86,7 +99,7 @@ export default Vue.extend({
             }
 
             switch (msg.method) {
-          	    case "changeTheme":
+          	    case InMsgType.ChangeTheme:
 				    const themeMsg = msg as ThemeMsg
 				    const styleSheet = document.getElementById("theme")  
 				    if (styleSheet)
@@ -101,7 +114,7 @@ export default Vue.extend({
 				    link.media = 'all'
 				    head.appendChild(link)
                     break    
-                case "itemsSource":
+                case InMsgType.ItemsSource:
                     const itemsSource = msg as NewItemsSource
                     this.itemsSource = { 
                         count: itemsSource.count, 
@@ -109,6 +122,14 @@ export default Vue.extend({
                         indexToSelect: itemsSource.indexToSelect 
                     }
                     break
+                case InMsgType.Items:
+                    const items = msg as Items
+                    let resolve = resolves.get(items.reqId)
+                    if (resolve) {
+                        resolves.delete(items.reqId)
+                        resolve(items.items)
+                    }
+                    break                    
             }
         }
     },
