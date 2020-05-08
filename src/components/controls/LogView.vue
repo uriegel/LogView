@@ -3,7 +3,7 @@
         <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'  
             @selection-changed="onSelectionChanged">
             <template v-slot=row >
-                <tr :class="{ 'isCurrent': row.item.index == selectedIndex }">
+                <tr :class="{ 'isCurrent': row.item.index == selectedIndex || (selectedIndex == 0 && !row.item.index)}">
                     <td>{{row.item.text}}</td>
                 </tr>
             </template>
@@ -58,6 +58,7 @@ interface Items extends InMsg {
 }
 
 var reqId = 0
+var refreshMode = false
 
 export default Vue.extend({
     data() {
@@ -119,7 +120,7 @@ export default Vue.extend({
                     this.itemsSource = { 
                         count: itemsSource.count, 
                         getItems, 
-                        indexToSelect: itemsSource.indexToSelect 
+                        indexToSelect: refreshMode ? itemsSource.indexToSelect : -1
                     }
                     break
                 case InMsgType.Items:
@@ -134,7 +135,10 @@ export default Vue.extend({
         }
     },
     methods: {
-        onSelectionChanged(index: number) { this.selectedIndex = index },
+        onSelectionChanged(index: number) { 
+            this.selectedIndex = index 
+            refreshMode = this.selectedIndex == this.itemsSource.count - 1
+        },
         async fill(evt: Event) {
             const count = await loadLogFile("/home/uwe/server.log")
             //const count = await loadLogFile("/home/uwe/Desktop/LogTest/test.log")

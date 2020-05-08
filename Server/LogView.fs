@@ -39,7 +39,7 @@ let rec startRefresh () =
     async {
         let lines = FileOperations.refresh ()
         if lines <> 0 then
-            send {| Method = Method.ItemsSource; Count = lines; IndexToSelect = - 1 |} 
+            send {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
         do! Async.Sleep 100
         startRefresh ()
     } |> Async.Start
