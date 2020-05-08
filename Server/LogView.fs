@@ -20,8 +20,7 @@ let initialize (session: Types.Session) =
         let rec loop () = async {
             let! getItems = queue.Receive ()
             let items = FileOperations.getLines getItems.StartRange getItems.EndRange
-            let payload = {| Method = Method.Items; Items = items; ReqId = getItems.ReqId |}
-            send (payload :> obj)
+            send {| Method = Method.Items; Items = items; ReqId = getItems.ReqId |}
             return! loop ()
         }
         loop ()  
@@ -36,14 +35,26 @@ let initialize (session: Types.Session) =
     send <- session.Start onReceive onClose << Json.serializeToBuffer
     changeTheme Globals.theme
 
+let rec startRefresh () = 
+    async {
+        let lines = FileOperations.refresh ()
+        if lines <> 0 then
+            send {| Method = Method.ItemsSource; Count = lines; IndexToSelect = - 1 |} 
+        do! Async.Sleep 100
+        startRefresh ()
+    } |> Async.Start
+
+
 let loadLogFile logFilePath = 
     async {
         let! lines = FileOperations.loadLogFile logFilePath
-        send {| Method = "itemsSource"; Count = lines; IndexToSelect = lines - 1 |} 
+        send {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+        startRefresh ()
     } |> Async.Start
     ()
 
+    // TODO: in .vue: if current pos is at the end send refresh tail on otherwise send refresh tail off
     // TODO: respond default theme
-    // TODO: getItems
     // TODO: Process indicator while loading file
+
 

@@ -84,9 +84,9 @@ export default Vue.extend({
     },
     mounted: function () {
         const ws = new WebSocket("ws://localhost:9866/logview")
+        let resolves = new Map<number, (items: any[])=>void>()
         ws.onmessage = m => {
             let msg = JSON.parse(m.data) as InMsg
-            let resolves = new Map<number, (items: any[])=>void>()
             const getItems = async (startRange: number, endRange: number) => {
                 return new Promise<any[]>((res, rej) => {
                     const msg: OutMsg = {
