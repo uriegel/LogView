@@ -59,17 +59,20 @@ let loadLogFile logFilePath = async {
 let refresh () = 
     let recentFileSize = fileSize
     let file = accessfile true 
-    if file.Position < recentFileSize then
+    if fileSize < recentFileSize then
         file.Position <- recentFileSize
         let newLines =
             file 
             |> createLogIndexes
             |> Seq.toArray
-        lineIndexes <- 
-            [| lineIndexes; newLines |] 
-            |> Seq.concat 
-            |> Seq.toArray
-        lineIndexes.Length
+        if newLines.Length > 0 then
+            lineIndexes <- 
+                [| lineIndexes; newLines |] 
+                |> Seq.concat 
+                |> Seq.toArray
+            lineIndexes.Length
+        else
+        0
     else
         0
 

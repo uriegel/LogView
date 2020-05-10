@@ -5,8 +5,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  	<ItemGroup>
+    	<ProjectReference Include="../../Server.fsproj" />
+  	</ItemGroup>
+
   <ItemGroup>
     <Compile Include="Program.fs" />
   </ItemGroup>
 
+<ItemGroup>
+		<PackageReference Include="WebWindowNetCore" Version="3.0.2" />
+		<PackageReference Include="UwebFiles" Version="2.0.0" />
+	</ItemGroup>
 </Project>
