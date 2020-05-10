@@ -59,7 +59,7 @@ let loadLogFile logFilePath = async {
 let refresh () = 
     let recentFileSize = fileSize
     let file = accessfile true 
-    if fileSize < recentFileSize then
+    if recentFileSize < fileSize then
         file.Position <- recentFileSize
         let newLines =
             file 
@@ -72,7 +72,7 @@ let refresh () =
                 |> Seq.toArray
             lineIndexes.Length
         else
-        0
+            0
     else
         0
 
