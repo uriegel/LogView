@@ -82,7 +82,11 @@ let getLines startIndex endIndex =
     let getString startPos length =
         file.Position <- startPos
         file.Read (buffer, 0, length) |> ignore
-        Encoding.UTF8.GetString (buffer, 0, length)
+        let line = Encoding.UTF8.GetString (buffer, 0, length)
+        if line <> "\r\n" then
+            line
+        else 
+            "-"
 
     let getNextIndex i =
         if i < lineIndexes.Length - 1 then 
