@@ -54,6 +54,7 @@ let loadLogFile logFilePath =
     ()
 
     // TODO: bind icon to INFO TRACE ...
+    // TODO: if no icon can be found: empty icon
     // TODO: in .vue: if current pos is at the end send refresh tail on otherwise send refresh tail off
     // TODO: Menu in Windows
     // TODO: OpenFile in Windows
