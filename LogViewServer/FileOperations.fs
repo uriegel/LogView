@@ -2,6 +2,7 @@ module FileOperations
 open System.IO
 open System.Text
 open Model
+open FSharpTools
 
 let mutable private lineIndexes: int64 array = [||]
 let mutable private path = ""

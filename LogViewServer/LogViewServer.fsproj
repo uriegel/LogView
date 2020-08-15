@@ -3,9 +3,9 @@
     <OutputType>Library</OutputType>
     <AssemblyName>ULogViewServer</AssemblyName>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.0.1</Version>
-		<FileVersion>0.0.1.0</FileVersion>
-		<AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <Version>0.0.2</Version>
+		<FileVersion>0.0.2.0</FileVersion>
+		<AssemblyVersion>0.0.2.0</AssemblyVersion>
 		<Authors>Uwe Riegel</Authors>
     	<Company>Uwe Riegel</Company>		
 		<Description>Server component for ULogView</Description>
@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharpTools" Version="2.4.0" />
+    <PackageReference Include="FSharpTools" Version="3.0.1" />
   </ItemGroup>
 
 </Project>
