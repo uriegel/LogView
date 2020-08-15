@@ -53,6 +53,9 @@ let loadLogFile logFilePath =
     } |> Async.Start
     ()
 
+    // TODO: openFile: with empty spaces: mask filename
+    // TODO: DragNDrop in Windows
+    // TODO: empty line: insert empty span X with class empty: opacity 0
     // TODO: in .vue: if current pos is at the end send refresh tail on otherwise send refresh tail off
     // TODO: respond default theme
     // TODO: Process indicator while loading file
