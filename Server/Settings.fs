@@ -4,7 +4,7 @@ open System.IO
 open Newtonsoft.Json.Linq
 open Newtonsoft.Json
 
-let private fileName = Path.Combine (Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "commander.json")
+let private fileName = Path.Combine (Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "logview.json")
 let private locker = obj ()
 
 if not (File.Exists fileName) then

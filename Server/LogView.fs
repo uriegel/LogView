@@ -53,7 +53,6 @@ let loadLogFile logFilePath =
     } |> Async.Start
     ()
 
-    // TODO: openFile: with empty spaces: mask filename
     // TODO: DragNDrop in Windows
     // TODO: Menu in Windows
     // TODO: OpenFile in Windows
