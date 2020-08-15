@@ -118,7 +118,7 @@ export default Vue.extend({
                 case InMsgType.ItemsSource:
                     const itemsSource = msg as NewItemsSource
                     this.itemsSource = { 
-                        count: itemsSource.count, 
+                        count: itemsSource.count || 0, 
                         getItems, 
                         indexToSelect: refreshMode ? itemsSource.indexToSelect : -1
                     }
