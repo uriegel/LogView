@@ -14,7 +14,7 @@
   </ItemGroup>
 
 <ItemGroup>
-		<PackageReference Include="WebWindowNetCore" Version="3.1.3" />
+		<PackageReference Include="WebWindowNetCore" Version="3.2.0" />
 		<PackageReference Include="UwebFiles" Version="3.1.0" />
 	</ItemGroup>
 </Project>
