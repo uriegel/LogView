@@ -30,3 +30,7 @@ Server/linux/LogView/bin
 Server/windows/LogView/bin/
 renderer
 debug.log
+LogViewServer/bin
+LogViewServer/obj
+LogViewServer/Tester/bin
+LogViewServer/Tester/obj

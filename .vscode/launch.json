@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Server/linux/LogView/bin/Debug/netcoreapp3.1/LogView.dll",
+            "program": "${workspaceFolder}/LogViewServer/Tester/bin/Debug/netcoreapp3.1/Tester.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -19,7 +19,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Server/windows/LogView/bin/Debug/netcoreapp3.1/LogView.exe",
+            "program": "${workspaceFolder}LogViewServer/Tester/bin/Debug/netcoreapp3.1/Tester.exe",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false
