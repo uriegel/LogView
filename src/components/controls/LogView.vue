@@ -4,7 +4,14 @@
             @selection-changed="onSelectionChanged">
             <template v-slot=row >
                 <tr :class="{ 'isCurrent': row.item.index == selectedIndex || (selectedIndex == 0 && !row.item.index)}">
-                    <td>{{row.item.text}}</td>
+                    <td class="icon-name">
+                        <!-- <trace-icon class="svg icon"></trace-icon> -->
+                        <!-- <info-icon class="svg icon"></info-icon> -->
+                        <!-- <warning-icon class="svg icon"></warning-icon> -->
+                        <!-- <error-icon class="svg icon"></error-icon> -->
+                        <stop-icon class="svg icon"></stop-icon>
+                        {{row.item.text}}
+                    </td>
                 </tr>
             </template>
         </table-view>
@@ -15,6 +22,11 @@
 import Vue from 'vue'
 import {ItemsSource, Column, TableViewItem } from 'virtual-table-vue'
 import { loadLogFile, getLines, refresh, scanFile } from '../../connection'
+import TraceIcon from '../../icons/TraceIcon.vue'
+import InfoIcon from '../../icons/InfoIcon.vue'
+import WarningIcon from '../../icons/WarningIcon.vue'
+import ErrorIcon from '../../icons/ErrorIcon.vue'
+import StopIcon from '../../icons/StopIcon.vue'
 
 enum InMsgType {
     ChangeTheme = 1,
@@ -61,6 +73,13 @@ var reqId = 0
 var refreshMode = false
 
 export default Vue.extend({
+    components: {
+        TraceIcon,
+        InfoIcon,
+        WarningIcon,
+        ErrorIcon,
+        StopIcon
+    },
     data() {
         return {
             tableEventBus: new Vue(),
@@ -175,5 +194,18 @@ export default Vue.extend({
 }
 .input {
     margin: 20px;
+}
+.icon-name {
+    display: block;
+}
+.svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: bottom;
+}
+.icon {
+    margin-right: 3px;
+    vertical-align: bottom;
+    height: 16px;
 }
 </style>

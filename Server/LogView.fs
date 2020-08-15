@@ -53,11 +53,10 @@ let loadLogFile logFilePath =
     } |> Async.Start
     ()
 
-    // TODO: empty line: insert empty span X with class empty: opacity 0
+    // TODO: bind icon to INFO TRACE ...
     // TODO: in .vue: if current pos is at the end send refresh tail on otherwise send refresh tail off
     // TODO: Menu in Windows
     // TODO: OpenFile in Windows
     // TODO: respond default theme
     // TODO: Process indicator while loading file
-
 
