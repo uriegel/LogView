@@ -76,17 +76,23 @@ let refresh () =
     else
         0
 
+let substring200 pos length (str: string) =
+    match str with
+    | null -> ""
+    | _ -> 
+        let pos = max 0 pos
+        let pos = min pos (str.Length - 1)
+        let length = max 0 length
+        let length = min length (str.Length - pos - 1)
+        str.Substring (pos, length)
+
 let getLines startIndex endIndex = 
     let file = accessfile false
     let buffer = Array.zeroCreate 200000    
     let getString startPos length =
         file.Position <- startPos
         file.Read (buffer, 0, length) |> ignore
-        let line = Encoding.UTF8.GetString (buffer, 0, length)
-        if line <> "\r\n" then
-            line
-        else 
-            "-"
+        Encoding.UTF8.GetString (buffer, 0, length)
 
     let getNextIndex i =
         if i < lineIndexes.Length - 1 then 
@@ -96,7 +102,25 @@ let getLines startIndex endIndex =
 
     let endIndex = if endIndex < lineIndexes.Length then endIndex else lineIndexes.Length - 1
     seq { for i in startIndex .. endIndex -> (lineIndexes.[i], getNextIndex i, i) }
-    |> Seq.map (fun (n, m, i) -> {
+    |> Seq.map (fun (n, m, i) -> 
+        let text = getString n (int (m - n))
+
+        let getText () = String.substring 21
+        let msgType = 
+                match text |> substring200 20 5 with
+                | "TRACE" -> MsgType.Trace
+                | "INFO " -> MsgType.Info
+                | "WARNI" -> MsgType.Warning
+                | "ERROR" -> MsgType.Error
+                | "FATAL" -> MsgType.Fatal
+                | _ -> MsgType.NewLine
+        let text = 
+            if msgType <> MsgType.NewLine then 
+                text |> String.substring 26
+            else
+                text
+        {
             Index = i
-            Text = getString n (int (m - n))
+            Text = text
+            MsgType = msgType
         })

@@ -114,11 +114,14 @@ let getLines startIndex endIndex =
         else 
             fileSize
 
+
     let endIndex = if endIndex < lineIndexes.Length then endIndex else lineIndexes.Length - 1
     seq { for i in startIndex .. endIndex -> (lineIndexes.[i], getNextIndex i, i) }
-    |> Seq.map (fun (n, m, i) -> {
+    |> Seq.map (fun (n, m, i) -> 
+        let text = getString n (int (m - n))
+        {
             Index = i
-            Text = getString n (int (m - n))
+            Text = "getString n (int (m - n))"
         })
     
 let scanFile () =
