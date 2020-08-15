@@ -43,6 +43,9 @@ let configuration = {
 [<STAThread>]
 let main argv =
     initialize configuration
+
+    openFile @"C:\ProgramData\caesar\Proxy\log\CaesarProxy.log"
+
     execute () |> ignore
     server.stop ()
     0

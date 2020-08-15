@@ -29,3 +29,4 @@ Server/windows/LogView/obj
 Server/linux/LogView/bin
 Server/windows/LogView/bin/
 renderer
+debug.log
