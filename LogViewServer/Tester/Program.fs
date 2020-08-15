@@ -2,7 +2,7 @@
 open System.IO
 open Server
 open Websocket
-open Model
+open ULogViewServer    
 
 if Environment.CurrentDirectory.Contains "netcoreapp" then
     Environment.CurrentDirectory <- Path.Combine (Environment.CurrentDirectory, "../../../../../../")

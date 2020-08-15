@@ -1,4 +1,4 @@
-namespace Model
+namespace ULogViewServer
 open System
 
 type Method = 
