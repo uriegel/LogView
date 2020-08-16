@@ -14,7 +14,7 @@ type Message =
 
 type Session() = 
     // TODO: LateInit
-    let mutable send: Func<obj, Unit> = Func<obj, Unit>(ignore)
+    let mutable send: Action<obj> = Action<obj>(ignore)
 
     let getItemsQueue = MailboxProcessor<GetItems>.Start (fun queue ->
         let rec loop () = async {
@@ -33,7 +33,7 @@ type Session() =
     member this.OnClose () =
         printfn "Client has disconnected"
 
-    member this.Initialize(sendToSet: Func<obj, Unit>) =
+    member this.Initialize(sendToSet: Action<obj>) =
         send <- sendToSet 
 
     member this.LoadLogFile logFilePath = 

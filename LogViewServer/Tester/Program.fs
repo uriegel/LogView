@@ -14,7 +14,7 @@ let initialize (socketSession: Types.Session) =
     let onReceive stream = session.OnReceive stream
     let onClose = session.OnClose
     let send = socketSession.Start onReceive onClose << Json.serializeToBuffer
-    let func = System.Func<obj, Unit>(send)
+    let func = System.Action<obj>(send)
     session.Initialize func
     session.LoadLogFile "/home/uwe/LogTest/test.log"
     
