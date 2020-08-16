@@ -58,7 +58,7 @@ export default Vue.extend({
             selectedIndex: 0,
             columns: [
                 {
-                    name: "",
+                    name: "Ereignisse",
                     isSortable: false
                 }
             ],
