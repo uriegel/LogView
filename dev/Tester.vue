@@ -1,8 +1,28 @@
+<template>
+    <event-log-view :connectionUrl="'ws://localhost:9866/logview'">
+    </event-log-view>
+</template>
+
+<script>
+
+        //"ws://localhost:9866/logview")
+        //const ws = new WebSocket("wss://cas-ws200109.caseris.intern/MonitorLog")
+
+import Vue from 'vue'
+import EventLogView from '../EventLogView.vue'
+
+export default Vue.extend({
+    components: {
+        EventLogView
+    },
+})
+</script>
+
+<style>
 :root {
     --tablevue-main-color: black;
     --tablevue-main-background-color: white;
     --tablevue-right-margin-scrollbar: 16px;
-    --font-size: 85%;
     
     --tablevue-scrollbar-width: 16px;
     --tablevue-scrollbar-border-width: 1px;
@@ -18,13 +38,18 @@
     --tablevue-scrollbar-button-background-color: white;
     --tablevue-scrollbar-button-hover-background-color: rgb(209, 209, 209);
     --tablevue-scrollbar-button-active-background-color: #aaa;
-
-    --tablevue-selected-color:  white;
-    --tablevue-selected-background-color: blue;
+    
+    --tablevue-selected-color: white;
+    --tablevue-selected-background-color: white;
     --tablevue-columns-separator-color:  white;
-    --tablevue-selected-background-hover-color: #0063ff;
+    --tablevue-selected-background-hover-color: #white;
     --tablevue-tr-selected-color: red;
-
-    --icon-color: #999;
-    --exif-color: blue;
 }
+body {
+    height: 100vh;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    color: #bbb;
+}
+</style>

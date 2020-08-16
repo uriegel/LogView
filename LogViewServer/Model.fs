@@ -2,9 +2,8 @@ namespace ULogViewServer
 open System
 
 type Method = 
-| ChangeTheme = 1
-| ItemsSource = 2  
-| Items = 3
+| ItemsSource = 1
+| Items = 2
 
 type MsgType = 
 | Trace = 1 

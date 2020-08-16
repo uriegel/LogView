@@ -11,7 +11,6 @@ type GetItems = {
 type Message =
     | GetItems of GetItems
 
-
 type Session() = 
     // TODO: LateInit
     let mutable send: Action<obj> = Action<obj>(ignore)
@@ -29,6 +28,15 @@ type Session() =
     let onReceive msg =
         match msg with
         | GetItems getItems -> getItemsQueue.Post getItems   
+
+    let rec startRefresh () = 
+        async {
+            let lines = FileOperations.refresh ()
+            if lines <> 0 then
+                send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+            do! Async.Sleep 100
+            startRefresh ()
+        } |> Async.Start        
 
     member this.OnReceive payload =
         let msg = Json.deserializeStream<Message> payload
@@ -48,7 +56,7 @@ type Session() =
         async {
             let! lines = FileOperations.loadLogFile logFilePath
             send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-            //startRefresh ()
+            startRefresh ()
             ()
         } |> Async.Start
 

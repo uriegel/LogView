@@ -1,23 +1,31 @@
 {
-	"name": "logview",
-	"version": "0.1.0",
-	"private": true,
+	"name": "event-log-vue",
+	"version": "0.0.1",
+	"description": "A event log view with virtual table vue control",
+	"main": "index.js",
 	"scripts": {
-		"dev": "vue-cli-service serve",
-		"build": "vue-cli-service build --modern",
-		"dist": "build -w --x64 --ia32"
+		"Test": "vue serve ./dev/Tester.vue"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/uriegel/LogView.git"
+	},
+	"keywords": [
+		"javascript",
+		"Vue",
+		"Vue plugin"
+	],
+	"author": "Uwe Riegel",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/uriegel/LogView/issues"
+	},
+	"homepage": "https://github.com/uriegel/LogView#readme",
+	"devDependencies": {
+		"@vue/cli": "^4.2.3",
+		"@vue/cli-service-global": "^4.2.3"
 	},
 	"dependencies": {
-		"virtual-table-vue": "^2.8.3",
-		"vue": "^2.6.11",
-		"vuex": "^3.1.2"
-	},
-	"devDependencies": {
-		"@vue/cli-plugin-typescript": "^4.4.6",
-		"@vue/cli-plugin-vuex": "^4.1.0",
-		"@vue/cli-service": "^4.4.6",
-		"cross-env": "^7.0.0",
-		"typescript": "~3.9.7",
-		"vue-template-compiler": "^2.6.11"
+		"virtual-table-vue": "^2.8.3"
 	}
 }

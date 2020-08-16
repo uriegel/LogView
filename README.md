@@ -1,24 +1,7 @@
-# logview
+# Build
+## Prerequisites:
+Command vue serve requires a global addon to be installed.
+Please run npm install -g @vue/cli-service-global and try again.
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Build nuget package
-```
-dotnet publish -c release
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Test
+```vue serve ./dev/<Component>Test.vue```

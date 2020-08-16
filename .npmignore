@@ -1,0 +1,7 @@
+.ionide
+.vscode
+dev
+LogViewServer
+node_modules
+Server
+README.md
