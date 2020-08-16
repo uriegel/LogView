@@ -43,6 +43,15 @@ export default Vue.extend({
     props: {
         connectionUrl: String
     },
+    watch: {
+        connectionUrl: {
+            immediate: true,
+            handler(newVal) {
+                if (newVal)
+                    this.runEvents()
+            }
+        }
+    },
     data() {
         return {
             tableEventBus: new Vue(),
@@ -60,46 +69,46 @@ export default Vue.extend({
             } 
         }
     },
-    mounted: function () {
-        const ws = new WebSocket(this.connectionUrl)
-        let resolves = new Map()
-        ws.onmessage = m => {
-            let msg = JSON.parse(m.data) 
-            const getItems = async (startRange, endRange) => {
-                return new Promise((res) => {
-                    const msg = {
-                        case: "GetItems",
-                        fields: [{ reqId: ++reqId, startRange, endRange }]
-                    }
-                    resolves.set(reqId, res)
-                    ws.send(JSON.stringify(msg))
-                })
-            }
-
-            switch (msg.method) {
-                case 1: {
-                    const itemsSource = msg
-                    this.itemsSource = { 
-                        count: itemsSource.count || 0, 
-                        getItems, 
-                        indexToSelect: refreshMode ? itemsSource.indexToSelect : -1
-                    }
-                    break
-                }
-                case 2: {
-                    const items = msg
-                    console.log("items", items)
-                    let resolve = resolves.get(items.reqId)
-                    if (resolve) {
-                        resolves.delete(items.reqId)
-                        resolve(items.items)
-                    }
-                    break      
-                }              
-            }
-        }
-    },
     methods: {
+        runEvents() {
+            const ws = new WebSocket(this.connectionUrl)
+            let resolves = new Map()
+            ws.onmessage = m => {
+                let msg = JSON.parse(m.data) 
+                const getItems = async (startRange, endRange) => {
+                    return new Promise((res) => {
+                        const msg = {
+                            case: "GetItems",
+                            fields: [{ reqId: ++reqId, startRange, endRange }]
+                        }
+                        resolves.set(reqId, res)
+                        ws.send(JSON.stringify(msg))
+                    })
+                }
+
+                switch (msg.method) {
+                    case 1: {
+                        const itemsSource = msg
+                        this.itemsSource = { 
+                            count: itemsSource.count || 0, 
+                            getItems, 
+                            indexToSelect: refreshMode ? itemsSource.indexToSelect : -1
+                        }
+                        break
+                    }
+                    case 2: {
+                        const items = msg
+                        console.log("items", items)
+                        let resolve = resolves.get(items.reqId)
+                        if (resolve) {
+                            resolves.delete(items.reqId)
+                            resolve(items.items)
+                        }
+                        break      
+                    }              
+                }
+            }
+        },
         onSelectionChanged(index) { 
             this.selectedIndex = index 
             refreshMode = this.selectedIndex == this.itemsSource.count - 1
