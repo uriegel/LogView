@@ -11,7 +11,7 @@ if Environment.CurrentDirectory.Contains "netcoreapp" then
 let session = Session ()
 
 let initialize (socketSession: Types.Session) = 
-    let onReceive stream = session.OnReceive stream
+    let onReceive (stream: Stream) = session.OnReceive stream
     let onClose = session.OnClose
     let send = socketSession.Start onReceive onClose << Json.serializeToBuffer
     let func = System.Action<obj>(send)

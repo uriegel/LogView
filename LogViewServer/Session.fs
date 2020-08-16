@@ -26,9 +26,17 @@ type Session() =
         loop ()  
     )    
 
-    member this.OnReceive payload =
-        match Json.deserializeStream<Message> payload with
+    let onReceive msg =
+        match msg with
         | GetItems getItems -> getItemsQueue.Post getItems   
+
+    member this.OnReceive payload =
+        let msg = Json.deserializeStream<Message> payload
+        onReceive msg
+
+    member this.OnReceive payload =
+        let msg = Json.deserialize<Message> payload 
+        onReceive msg
 
     member this.OnClose () =
         printfn "Client has disconnected"
