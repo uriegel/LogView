@@ -1,6 +1,6 @@
 {
 	"name": "event-log-vue",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "A event log view with virtual table vue control",
 	"main": "index.js",
 	"scripts": {
