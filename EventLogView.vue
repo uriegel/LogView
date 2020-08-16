@@ -21,14 +21,12 @@
 
 <script>
 import Vue from 'vue'
-import TableView from 'virtual-table-vue'
 import NewLineIcon from './icons/NewLineIcon.vue'
 import TraceIcon from './icons/TraceIcon.vue'
 import InfoIcon from './icons/InfoIcon.vue'
 import WarningIcon from './icons/WarningIcon.vue'
 import ErrorIcon from './icons/ErrorIcon.vue'
 import StopIcon from './icons/StopIcon.vue'
-Vue.use(TableView)
 
 var reqId = 0
 var refreshMode = false

@@ -10,6 +10,9 @@
 
 import Vue from 'vue'
 import EventLogView from '../EventLogView.vue'
+import TableView from 'virtual-table-vue'
+
+Vue.use(TableView)
 
 export default Vue.extend({
     components: {
