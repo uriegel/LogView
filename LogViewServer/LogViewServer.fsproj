@@ -1,36 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <AssemblyName>ULogViewServer</AssemblyName>
+    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.0.3</Version>
-		<FileVersion>0.0.3.0</FileVersion>
-		<AssemblyVersion>0.0.3.0</AssemblyVersion>
-		<Authors>Uwe Riegel</Authors>
-    	<Company>Uwe Riegel</Company>		
-		<Description>Server component for ULogView</Description>
-		<PackageLicenseUrl></PackageLicenseUrl>
-		<PackageProjectUrl>https://github.com/uriegel/LogView</PackageProjectUrl>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<PackageTags>FSharp</PackageTags>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>    
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Model.fs" />
     <Compile Include="FileOperations.fs" />
-    <Compile Include="Server.fs" />
+    <Compile Include="Session.fs" />
+    <None Include="../LICENSE" />
   </ItemGroup>
-
-  <ItemGroup>
-    	<None Include="..\LICENSE">
-      		<Pack>True</Pack>
-      	<PackagePath></PackagePath>
-    	</None>
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="FSharpTools" Version="3.0.1" />
   </ItemGroup>
-
 </Project>

@@ -3,13 +3,20 @@ open System.IO
 open Server
 open Websocket
 open ULogViewServer    
+open FSharpTools
 
 if Environment.CurrentDirectory.Contains "netcoreapp" then
     Environment.CurrentDirectory <- Path.Combine (Environment.CurrentDirectory, "../../../../../../")
 
-let initialize (session: Types.Session) = 
-    Server.initialize session.Start
-    Server.loadLogFile "/home/uwe/LogTest/test.log"
+let session = Session ()
+
+let initialize (socketSession: Types.Session) = 
+    let onReceive stream = session.OnReceive stream
+    let onClose = session.OnClose
+    let send = socketSession.Start onReceive onClose << Json.serializeToBuffer
+    let func = System.Func<obj, Unit>(send)
+    session.Initialize func
+    session.LoadLogFile "/home/uwe/LogTest/test.log"
     
 let start () = 
     let requests = [ 
