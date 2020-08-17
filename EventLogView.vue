@@ -31,7 +31,6 @@ import ErrorIcon from './icons/ErrorIcon.vue'
 import StopIcon from './icons/StopIcon.vue'
 
 var reqId = 0
-var refreshMode = false
 var ws
 
 export default Vue.extend({
@@ -53,11 +52,18 @@ export default Vue.extend({
                 if (newVal)
                     this.runEvents()
             }
+        },
+        refreshMode: {
+            immediate: true,
+            handler(newVal) {
+                this.setRefresh(newVal)
+            }
         }
     },
     data() {
         return {
             tableEventBus: new Vue(),
+            refreshMode: false,
             selectedIndex: 0,
             columns: [
                 {
@@ -102,7 +108,7 @@ export default Vue.extend({
                         this.itemsSource = { 
                             count: itemsSource.count || 0, 
                             getItems, 
-                            indexToSelect: refreshMode ? itemsSource.indexToSelect : -1
+                            indexToSelect: this.refreshMode ? itemsSource.indexToSelect : -1
                         }
                         break
                     }
@@ -121,8 +127,15 @@ export default Vue.extend({
         },
         onSelectionChanged(index) { 
             this.selectedIndex = index 
-            refreshMode = this.selectedIndex == this.itemsSource.count - 1
+            this.refreshMode = this.selectedIndex == this.itemsSource.count - 1
         },
+        setRefresh(value) {
+            const msg = {
+                case: "SetRefreshMode",
+                fields: [{ value }]
+            }
+            ws.send(JSON.stringify(msg))
+        }
     },
     beforeDestroy() {
         if (ws)

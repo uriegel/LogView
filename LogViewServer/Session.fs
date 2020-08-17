@@ -8,12 +8,18 @@ type GetItems = {
     EndRange: int
 }
 
+type SetRefreshMode = {
+    Value: bool
+}
+
 type Message =
     | GetItems of GetItems
+    | SetRefreshMode of SetRefreshMode
 
 type Session() = 
     // TODO: LateInit
     let mutable send: Action<obj> = Action<obj>(ignore)
+    let mutable formatMilliseconds = false
 
     let getItemsQueue = MailboxProcessor<GetItems>.Start (fun queue ->
         let rec loop () = async {
@@ -25,9 +31,7 @@ type Session() =
         loop ()  
     )    
 
-    let onReceive msg =
-        match msg with
-        | GetItems getItems -> getItemsQueue.Post getItems   
+    let mutable refreshMode = true
 
     let rec startRefresh () = 
         async {
@@ -35,8 +39,15 @@ type Session() =
             if lines <> 0 then
                 send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
             do! Async.Sleep 100
-            startRefresh ()
+            if refreshMode then startRefresh ()
         } |> Async.Start        
+
+    let onReceive msg =
+        match msg with
+        | GetItems getItems -> getItemsQueue.Post getItems   
+        | SetRefreshMode setRefreshMode -> 
+            refreshMode <- setRefreshMode.Value
+            if refreshMode then startRefresh () 
 
     member this.OnReceive payload =
         let msg = Json.deserializeStream<Message> payload
@@ -49,6 +60,12 @@ type Session() =
     member this.OnClose () =
         ()
 
+    member this.FormatMilliseconds
+        with get () = formatMilliseconds
+        and set value = 
+            formatMilliseconds <- value
+            FileOperations.setFormatMilliseconds value
+
     member this.Initialize(sendToSet: Action<obj>) =
         send <- sendToSet 
 
@@ -60,5 +77,4 @@ type Session() =
             ()
         } |> Async.Start
 
-        // TODO: in .vue: if current pos is at the end send refresh tail on otherwise send refresh tail off
     

@@ -7,12 +7,15 @@ module FileOperations =
     let mutable private lineIndexes: int64 array = [||]
     let mutable private path = ""
     let mutable fileSize = 0L
+    let mutable formatMilliseconds = false
 
     let private accessfile adjustLength = 
         let file = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
         if adjustLength then
             fileSize <-file.Length
         file
+
+    let setFormatMilliseconds value = formatMilliseconds <- value        
 
     let private createLogIndexes (file: FileStream) =
         let buffer = Array.zeroCreate 20000
@@ -88,6 +91,10 @@ module FileOperations =
             str.Substring (pos, length)
 
     let getLines startIndex endIndex = 
+        let posType = if formatMilliseconds then 24 else 20
+        let timeLength = if formatMilliseconds then 12 else 8
+        let textPos = if formatMilliseconds then 29 else 25
+
         let file = accessfile false
         let buffer = Array.zeroCreate 200000    
         let getString startPos length =
@@ -109,20 +116,19 @@ module FileOperations =
             let getItemParts text msgType =
                 if msgType <> MsgType.NewLine then 
                     let date = text |> String.substring2 0 10
-                    let time = text |> String.substring2 11 8
+                    let time = text |> String.substring2 11 timeLength
                     let evtPos = text |> String.indexOf " - "
                     let cat, evt = 
                         match evtPos with
                         | Some evtPos -> 
-                            text |> String.substring2 25 (evtPos - 25), text |> String.substring (evtPos + 3)
-                        | None -> "", text |> String.substring 26 
+                            text |> String.substring2 textPos (evtPos - textPos), text |> String.substring (evtPos + 3)
+                        | None -> "", text |> String.substring (textPos + 1) 
                     [| date + " " + time; cat; evt |]
                 else
                     [| ""; ""; text |]
 
-            let getText () = String.substring 21
             let msgType = 
-                    match text |> substring200 20 5 with
+                    match text |> substring200 posType 5 with
                     | "TRACE" -> MsgType.Trace
                     | "INFO " -> MsgType.Info
                     | "WARNI" -> MsgType.Warning

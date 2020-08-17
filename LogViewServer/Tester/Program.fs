@@ -16,7 +16,11 @@ let initialize (socketSession: Types.Session) =
     let send = socketSession.Start onReceive onClose << Json.serializeToBuffer
     let func = System.Action<obj>(send)
     session.Initialize func
+    
     session.LoadLogFile "/home/uwe/LogTest/test.log"
+    
+    //session.FormatMilliseconds <- true
+    //session.LoadLogFile "/home/uwe/LogTest/testm.log"
     
 let start () = 
     let requests = [ 

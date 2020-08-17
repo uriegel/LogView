@@ -53,9 +53,5 @@ let loadLogFile logFilePath =
     } |> Async.Start
     ()
 
-    // TODO: in .vue: if current pos is at the end send refresh tail on otherwise send refresh tail off
-    // TODO: Menu in Windows
-    // TODO: OpenFile in Windows
-    // TODO: respond default theme
     // TODO: Process indicator while loading file
 
