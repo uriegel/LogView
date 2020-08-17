@@ -106,6 +106,20 @@ module FileOperations =
         |> Seq.map (fun (n, m, i) -> 
             let text = getString n (int (m - n))
 
+            let getItemParts text msgType =
+                if msgType <> MsgType.NewLine then 
+                    let date = text |> String.substring2 0 10
+                    let time = text |> String.substring2 11 8
+                    let evtPos = text |> String.indexOf " - "
+                    let cat, evt = 
+                        match evtPos with
+                        | Some evtPos -> 
+                            text |> String.substring2 25 (evtPos - 25), text |> String.substring (evtPos + 3)
+                        | None -> "", text |> String.substring 26 
+                    [| date + " " + time; cat; evt |]
+                else
+                    [| ""; ""; text |]
+
             let getText () = String.substring 21
             let msgType = 
                     match text |> substring200 20 5 with
@@ -115,13 +129,8 @@ module FileOperations =
                     | "ERROR" -> MsgType.Error
                     | "FATAL" -> MsgType.Fatal
                     | _ -> MsgType.NewLine
-            let text = 
-                if msgType <> MsgType.NewLine then 
-                    text |> String.substring 26
-                else
-                    text
             {
                 Index = i
-                Text = text
+                ItemParts = getItemParts text msgType
                 MsgType = msgType
             })

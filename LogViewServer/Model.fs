@@ -15,6 +15,6 @@ type MsgType =
 
 type LineItem = {
     Index: int
-    Text: string
+    ItemParts: string array
     MsgType: MsgType
 }

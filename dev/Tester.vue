@@ -43,7 +43,7 @@ export default Vue.extend({
     --tablevue-scrollbar-button-active-background-color: #aaa;
     
     --tablevue-selected-color: white;
-    --tablevue-selected-background-color: white;
+    --tablevue-selected-background-color: blue;
     --tablevue-columns-separator-color:  white;
     --tablevue-selected-background-hover-color: #white;
     --tablevue-tr-selected-color: red;

@@ -11,8 +11,10 @@
                         <error-icon v-if="row.item.msgType == 4" class="svg icon"></error-icon>
                         <stop-icon v-if="row.item.msgType == 5" class="svg icon"></stop-icon>
                         <new-line-icon v-if="row.item.msgType == 6" class="svg icon"></new-line-icon> 
-                        {{row.item.text}}
+                        {{row.item.itemParts[0]}}
                     </td>
+                    <td>{{row.item.itemParts[1]}}</td>
+                    <td>{{row.item.itemParts[2]}}</td>
                 </tr>
             </template>
         </table-view>
@@ -30,6 +32,7 @@ import StopIcon from './icons/StopIcon.vue'
 
 var reqId = 0
 var refreshMode = false
+var ws
 
 export default Vue.extend({
     components: {
@@ -58,9 +61,16 @@ export default Vue.extend({
             selectedIndex: 0,
             columns: [
                 {
-                    name: "Ereignisse",
-                    isSortable: false
-                }
+                    name: "Zeit",
+                    width: "5em"
+                },
+                {
+                    name: "Kategorie",
+                    width: "3em"
+                },
+                {
+                    name: "Ereignis",
+                },
             ],
             itemsSource: { 
                 count: 0,
@@ -71,7 +81,7 @@ export default Vue.extend({
     },
     methods: {
         runEvents() {
-            const ws = new WebSocket(this.connectionUrl)
+            ws = new WebSocket(this.connectionUrl)
             let resolves = new Map()
             ws.onmessage = m => {
                 let msg = JSON.parse(m.data) 
@@ -113,7 +123,11 @@ export default Vue.extend({
             this.selectedIndex = index 
             refreshMode = this.selectedIndex == this.itemsSource.count - 1
         },
-    }
+    },
+    beforeDestroy() {
+        if (ws)
+            ws.close()
+    }    
 })
 </script>
 

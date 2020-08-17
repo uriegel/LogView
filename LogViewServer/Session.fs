@@ -47,7 +47,7 @@ type Session() =
         onReceive msg
 
     member this.OnClose () =
-        printfn "Client has disconnected"
+        ()
 
     member this.Initialize(sendToSet: Action<obj>) =
         send <- sendToSet 
@@ -60,10 +60,5 @@ type Session() =
             ()
         } |> Async.Start
 
-    // let changeTheme theme = send {| Method = Method.ChangeTheme; Theme = theme |} 
-
         // TODO: in .vue: if current pos is at the end send refresh tail on otherwise send refresh tail off
-        // TODO: Menu in Windows
-        // TODO: OpenFile in Windows
-        // TODO: respond default theme
-        // TODO: Process indicator while loading file
+    
