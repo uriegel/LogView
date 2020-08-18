@@ -98,6 +98,7 @@ export default Vue.extend({
                             fields: [{ reqId: ++reqId, startRange, endRange }]
                         }
                         resolves.set(reqId, res)
+                        console.log("GetItems endrange", endRange)
                         ws.send(JSON.stringify(msg))
                     })
                 }
