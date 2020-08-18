@@ -114,7 +114,7 @@ export default Vue.extend({
                     }
                     case 2: {
                         const items = msg
-                        console.log("items", items)
+                        console.log("items", items, this.itemsSource.count)
                         let resolve = resolves.get(items.reqId)
                         if (resolve) {
                             resolves.delete(items.reqId)
