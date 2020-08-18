@@ -95,10 +95,9 @@ export default Vue.extend({
                     return new Promise((res) => {
                         const msg = {
                             case: "GetItems",
-                            fields: [{ reqId: ++reqId, startRange, endRange }]
+                            fields: [{ reqId: ++reqId, startRange, endRange:Math.min(endRange, this.itemsSource.count - 1)}]
                         }
                         resolves.set(reqId, res)
-                        console.log("GetItems endrange", endRange)
                         ws.send(JSON.stringify(msg))
                     })
                 }
