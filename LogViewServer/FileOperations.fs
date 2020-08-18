@@ -1,23 +1,19 @@
 namespace ULogViewServer
-module FileOperations = 
-    open System.IO
-    open System.Text
-    open FSharpTools
+open System.IO
+open System.Text
+open FSharpTools
+open FSharpTools.String
 
-    let mutable private lineIndexes: int64 array = [||]
-    let mutable private path = ""
+type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) = 
     let mutable fileSize = 0L
-    let mutable formatMilliseconds = false
 
-    let private accessfile adjustLength = 
+    let accessfile adjustLength = 
         let file = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
         if adjustLength then
             fileSize <-file.Length
         file
 
-    let setFormatMilliseconds value = formatMilliseconds <- value        
-
-    let private createLogIndexes (file: FileStream) =
+    let createLogIndexes (file: FileStream) =
         let buffer = Array.zeroCreate 20000
 
         let getLines () =
@@ -51,56 +47,23 @@ module FileOperations =
 
         getLines ()
 
-    let loadLogFile logFilePath = async {
-        path <- logFilePath
-        lineIndexes <-
-            accessfile true 
-            |> createLogIndexes 
-            |> Seq.toArray    
-        return lineIndexes.Length 
-    } 
+    let mutable lineIndexes =
+        use file = accessfile true 
+        file
+        |> createLogIndexes 
+        |> Seq.toArray    
 
-    let refresh () = 
-        let recentFileSize = fileSize
-        let file = accessfile true 
-        if recentFileSize < fileSize then
-            file.Position <- recentFileSize
-            let newLines =
-                file 
-                |> createLogIndexes
-                |> Seq.toArray
-            if newLines.Length > 0 then
-                lineIndexes <- 
-                    [| lineIndexes; newLines |] 
-                    |> Seq.concat 
-                    |> Seq.toArray
-                lineIndexes.Length
-            else
-                0
-        else
-            0
-
-    let substring200 pos length (str: string) =
-        match str with
-        | null -> ""
-        | _ -> 
-            let pos = max 0 pos
-            let pos = min pos (str.Length - 1)
-            let length = max 0 length
-            let length = min length (str.Length - pos - 1)
-            str.Substring (pos, length)
-
-    let getLines startIndex endIndex = 
+    let getLines (file: Stream) startIndex endIndex =
         let posType = if formatMilliseconds then 24 else 20
         let timeLength = if formatMilliseconds then 12 else 8
         let textPos = if formatMilliseconds then 29 else 25
 
-        let file = accessfile false
         let buffer = Array.zeroCreate 200000    
         let getString startPos length =
             file.Position <- startPos
             file.Read (buffer, 0, length) |> ignore
-            Encoding.UTF8.GetString (buffer, 0, length)
+            let encoding = if utf8 then Encoding.UTF8 else Encoding.UTF8
+            encoding.GetString (buffer, 0, length)
 
         let getNextIndex i =
             if i < lineIndexes.Length - 1 then 
@@ -128,15 +91,44 @@ module FileOperations =
                     [| ""; ""; text |]
 
             let msgType = 
-                    match text |> substring200 posType 5 with
-                    | "TRACE" -> MsgType.Trace
-                    | "INFO " -> MsgType.Info
-                    | "WARNI" -> MsgType.Warning
-                    | "ERROR" -> MsgType.Error
-                    | "FATAL" -> MsgType.Fatal
-                    | _ -> MsgType.NewLine
+                match text |> substring2 posType 5 with
+                | "TRACE" -> MsgType.Trace
+                | "INFO " -> MsgType.Info
+                | "WARNI" -> MsgType.Warning
+                | "ERROR" -> MsgType.Error
+                | "FATAL" -> MsgType.Fatal
+                | _ -> MsgType.NewLine
             {
                 Index = i
                 ItemParts = getItemParts text msgType
                 MsgType = msgType
             })
+
+    member this.LineCount = lineIndexes.Length 
+
+    member this.Refresh () = 
+        let recentFileSize = fileSize
+        use file = accessfile true 
+        if recentFileSize < fileSize then
+            file.Position <- recentFileSize
+            let newLines =
+                file 
+                |> createLogIndexes
+                |> Seq.toArray
+            if newLines.Length > 0 then
+                lineIndexes <- 
+                    [| lineIndexes; newLines |] 
+                    |> Seq.concat 
+                    |> Seq.toArray
+                lineIndexes.Length
+            else
+                0
+        else
+            0
+
+    member this.GetLines startIndex endIndex = 
+        use file = accessfile false
+        getLines file startIndex endIndex
+        |> Seq.toArray
+        
+

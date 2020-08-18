@@ -8,19 +8,16 @@ open FSharpTools
 if Environment.CurrentDirectory.Contains "netcoreapp" then
     Environment.CurrentDirectory <- Path.Combine (Environment.CurrentDirectory, "../../../../../../")
 
-let session = Session ()
+let mutable sessionHolder: Session Option = None
 
 let initialize (socketSession: Types.Session) = 
+    let session = Session ("/home/uwe/LogTest/test.log", false, false)
+    sessionHolder <- Some session //session.LoadLogFile "/home/uwe/LogTest/testm.log"
     let onReceive (stream: Stream) = session.OnReceive stream
     let onClose = session.OnClose
     let send = socketSession.Start onReceive onClose << Json.serializeToBuffer
-    let func = System.Action<obj>(send)
+    let func = Action<obj>(send)
     session.Initialize func
-    
-    session.LoadLogFile "/home/uwe/LogTest/test.log"
-    
-    //session.FormatMilliseconds <- true
-    //session.LoadLogFile "/home/uwe/LogTest/testm.log"
     
 let start () = 
     let requests = [ 

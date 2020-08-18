@@ -16,15 +16,15 @@ type Message =
     | GetItems of GetItems
     | SetRefreshMode of SetRefreshMode
 
-type Session() = 
+type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) = 
+    let fileOperations = FileOperations (logFilePath, formatMilliseconds, utf8)
     // TODO: LateInit
     let mutable send: Action<obj> = Action<obj>(ignore)
-    let mutable formatMilliseconds = false
 
     let getItemsQueue = MailboxProcessor<GetItems>.Start (fun queue ->
         let rec loop () = async {
             let! getItems = queue.Receive ()
-            let items = FileOperations.getLines getItems.StartRange getItems.EndRange
+            let items = fileOperations.GetLines getItems.StartRange getItems.EndRange
             send.Invoke {| Method = Method.Items; Items = items; ReqId = getItems.ReqId |}
             return! loop ()
         }
@@ -35,7 +35,7 @@ type Session() =
 
     let rec startRefresh () = 
         async {
-            let lines = FileOperations.refresh ()
+            let lines = fileOperations.Refresh ()
             if lines <> 0 then
                 send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
             do! Async.Sleep 100
@@ -60,21 +60,10 @@ type Session() =
     member this.OnClose () =
         ()
 
-    member this.FormatMilliseconds
-        with get () = formatMilliseconds
-        and set value = 
-            formatMilliseconds <- value
-            FileOperations.setFormatMilliseconds value
-
     member this.Initialize(sendToSet: Action<obj>) =
         send <- sendToSet 
-
-    member this.LoadLogFile logFilePath = 
-        async {
-            let! lines = FileOperations.loadLogFile logFilePath
-            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-            startRefresh ()
-            ()
-        } |> Async.Start
+        let lines = fileOperations.LineCount
+        send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+        startRefresh ()
 
     
