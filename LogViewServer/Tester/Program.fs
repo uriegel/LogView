@@ -11,8 +11,9 @@ if Environment.CurrentDirectory.Contains "netcoreapp" then
 let mutable sessionHolder: Session Option = None
 
 let initialize (socketSession: Types.Session) = 
-    let session = Session ("/home/uwe/LogTest/test.log", false, false)
-    sessionHolder <- Some session //session.LoadLogFile "/home/uwe/LogTest/testm.log"
+    //let session = Session ("/home/uwe/LogTest/test.log", false, true) //session.LoadLogFile "/home/uwe/LogTest/testm.log"
+    let session = Session ("/home/uwe/LogTest/CaesarProxy.log", false, false)
+    sessionHolder <- Some session 
     let onReceive (stream: Stream) = session.OnReceive stream
     let onClose = session.OnClose
     let send = socketSession.Start onReceive onClose << Json.serializeToBuffer

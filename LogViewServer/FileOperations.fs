@@ -3,6 +3,7 @@ open System.IO
 open System.Text
 open FSharpTools
 open FSharpTools.String
+open System.Globalization
 
 type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) = 
     let mutable fileSize = 0L
@@ -62,7 +63,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         let getString startPos length =
             file.Position <- startPos
             file.Read (buffer, 0, length) |> ignore
-            let encoding = if utf8 then Encoding.UTF8 else Encoding.UTF8
+            let encoding = if utf8 then Encoding.UTF8 else Encoding.GetEncoding (CultureInfo.CurrentCulture.TextInfo.ANSICodePage)
             encoding.GetString (buffer, 0, length)
 
         let getNextIndex i =

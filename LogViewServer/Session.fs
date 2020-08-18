@@ -1,5 +1,6 @@
 namespace ULogViewServer
 open System
+open System.Text
 open FSharpTools
 
 type GetItems = {
@@ -48,6 +49,9 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         | SetRefreshMode setRefreshMode -> 
             refreshMode <- setRefreshMode.Value
             if refreshMode then startRefresh () 
+
+    static do 
+        Encoding.RegisterProvider CodePagesEncodingProvider.Instance |> ignore
 
     member this.OnReceive payload =
         let msg = Json.deserializeStream<Message> payload
