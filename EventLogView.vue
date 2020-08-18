@@ -95,7 +95,7 @@ export default Vue.extend({
                     return new Promise((res) => {
                         const msg = {
                             case: "GetItems",
-                            fields: [{ reqId: ++reqId, startRange, endRange }]
+                            fields: [{ reqId: ++reqId, startRange, endRange:Math.min(endRange, this.itemsSource.count - 1)}]
                         }
                         resolves.set(reqId, res)
                         ws.send(JSON.stringify(msg))
@@ -114,7 +114,7 @@ export default Vue.extend({
                     }
                     case 2: {
                         const items = msg
-                        console.log("items", items)
+                        console.log("items", items, this.itemsSource.count)
                         let resolve = resolves.get(items.reqId)
                         if (resolve) {
                             resolves.delete(items.reqId)
