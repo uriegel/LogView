@@ -91,17 +91,19 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                             false
 
                 let rec compareFirst pos =
-                    if pos = length - searchBuffer.Length then
-                        None
+                    if pos >= length - searchBuffer.Length then
+                        false
                     else
                         if buffer.[pos] = searchBuffer.[0] then 
-                            Some pos
+                            //Some pos
+                            if compare pos 0 then
+                                true
+                            else 
+                                compareFirst (pos + 1)
                         else
                             compareFirst (pos + 1)
 
-                match compareFirst 0 with
-                | Some pos -> compare pos 0
-                | None -> false
+                compareFirst 0 
 
             let filter line = 
                 let rawLine, length = getLine line 
