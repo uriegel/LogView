@@ -76,8 +76,11 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
         match restriction with
         | Some restriction -> 
-            let searchStr = encoding.GetBytes restriction
-            //let searchStr = encoding.GetBytes "Refreshing User Cache" 
+            let searchStrings = 
+                restriction
+                |> String.splitChar '|'
+                |> Array.map encoding.GetBytes
+            
             let getLine = getRawLine file
 
             let findSearchStr (buffer: byte array) (searchBuffer: byte array) length =
@@ -107,7 +110,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
             let filter line = 
                 let rawLine, length = getLine line 
-                findSearchStr rawLine searchStr length
+                searchStrings |> Array.filter (fun n -> findSearchStr rawLine n length) |> Array.length > 0
 
             let lineIndexes = 
                 lineIndexes 
