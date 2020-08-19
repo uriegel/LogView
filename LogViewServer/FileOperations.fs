@@ -27,6 +27,11 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         file.Read (buffer, 0, line.Length) |> ignore
         encoding.GetString (buffer, 0, line.Length)
 
+    let getRawLine (file: Stream) line =
+        file.Position <- line.Pos
+        file.Read (buffer, 0, line.Length) |> ignore
+        buffer, line.Length
+
     let createLogIndexes (file: FileStream) =
         let buffer = Array.zeroCreate 20000
 
@@ -67,14 +72,36 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
         printfn "get start"
 
-        let getString = getString file
-        let endIndex = lineIndexes.Length - 1
+        let searchStr = encoding.GetBytes "Refreshing User Cache" 
+
+        let getLine = getRawLine file
+
+        let findSearchStr (buffer: byte array) (searchBuffer: byte array) length =
+            let rec compare index pos =
+                if pos = searchBuffer.Length then
+                    true
+                else
+                    if buffer.[index + pos] = searchBuffer.[pos] then 
+                        compare index (pos + 1)
+                    else
+                        false
+
+            let rec compareFirst pos =
+                if pos = length - searchBuffer.Length then
+                    None
+                else
+                    if buffer.[pos] = searchBuffer.[0] then 
+                        Some pos
+                    else
+                        compareFirst (pos + 1)
+
+            match compareFirst 0 with
+            | Some pos -> compare pos 0
+            | None -> false
 
         let filter line = 
-            let text = getString line 
-            match text |> String.indexOf "Refreshing User Cache" with
-            | Some v -> true
-            | None -> false
+            let rawLine, length = getLine line 
+            findSearchStr rawLine searchStr length
 
         let lineIndexes = 
             lineIndexes 
