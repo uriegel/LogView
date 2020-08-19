@@ -83,4 +83,5 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
         startRefresh ()
 
-    
+    // TODO: Restriction: "Current" => 0, urrent => OK
+    // TODO: Restriction: "Line State" => index out of bounds
