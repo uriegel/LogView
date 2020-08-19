@@ -13,7 +13,7 @@ type Line = {
 
 type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) = 
     let mutable fileSize = 0L
-    let buffer = Array.zeroCreate 200000    
+    let buffer = Array.zeroCreate 80000    
     let encoding = if utf8 then Encoding.UTF8 else Encoding.GetEncoding (CultureInfo.CurrentCulture.TextInfo.ANSICodePage)
 
     let accessfile adjustLength = 
