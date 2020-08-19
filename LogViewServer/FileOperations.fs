@@ -50,7 +50,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                     Some (0L  // Initial state
                         |> Seq.unfold (fun state ->
                             match findChr buffer (int state) read (byte '\n') with
-                            | Some pos -> Some( state + fileOffset, int64 (pos + 1))
+                            | Some pos -> Some( fileOffset + int64 (pos + 1), int64 (pos + 1))
                             | None -> None
                         )
                     )
@@ -64,6 +64,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                     | None -> None) 
                 |> Seq.concat
                 |> Seq.toArray
+            let indexes = Array.concat [ [|0L|]; indexes ]
 
             seq { for i in 1 .. indexes.Length - 1 -> { Pos = indexes.[i-1]; Length = int (indexes.[i] - indexes.[i-1]) }}                
             |> Seq.toArray
