@@ -13,6 +13,7 @@ type Line = {
 
 type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) = 
     let mutable fileSize = 0L
+    let mutable restriction: string option = None
     let buffer = Array.zeroCreate 80000    
     let encoding = if utf8 then Encoding.UTF8 else Encoding.GetEncoding (CultureInfo.CurrentCulture.TextInfo.ANSICodePage)
 
@@ -73,47 +74,46 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
         printfn "get start"
 
-        let searchStr = encoding.GetBytes "Refreshing User Cache" 
+        match restriction with
+        | Some restriction -> 
+            let searchStr = encoding.GetBytes restriction
+            //let searchStr = encoding.GetBytes "Refreshing User Cache" 
+            let getLine = getRawLine file
 
-        let getLine = getRawLine file
-
-        let findSearchStr (buffer: byte array) (searchBuffer: byte array) length =
-            let rec compare index pos =
-                if pos = searchBuffer.Length then
-                    true
-                else
-                    if buffer.[index + pos] = searchBuffer.[pos] then 
-                        compare index (pos + 1)
+            let findSearchStr (buffer: byte array) (searchBuffer: byte array) length =
+                let rec compare index pos =
+                    if pos = searchBuffer.Length then
+                        true
                     else
-                        false
+                        if buffer.[index + pos] = searchBuffer.[pos] then 
+                            compare index (pos + 1)
+                        else
+                            false
 
-            let rec compareFirst pos =
-                if pos = length - searchBuffer.Length then
-                    None
-                else
-                    if buffer.[pos] = searchBuffer.[0] then 
-                        Some pos
+                let rec compareFirst pos =
+                    if pos = length - searchBuffer.Length then
+                        None
                     else
-                        compareFirst (pos + 1)
+                        if buffer.[pos] = searchBuffer.[0] then 
+                            Some pos
+                        else
+                            compareFirst (pos + 1)
 
-            match compareFirst 0 with
-            | Some pos -> compare pos 0
-            | None -> false
+                match compareFirst 0 with
+                | Some pos -> compare pos 0
+                | None -> false
 
-        let filter line = 
-            let rawLine, length = getLine line 
-            findSearchStr rawLine searchStr length
+            let filter line = 
+                let rawLine, length = getLine line 
+                findSearchStr rawLine searchStr length
 
-        let lineIndexes = 
-            lineIndexes 
-            |> Array.filter filter
+            let lineIndexes = 
+                lineIndexes 
+                |> Array.filter filter
 
-        printfn "get end"
-
-        lineIndexes
-
-
-
+            printfn "get end"
+            lineIndexes
+        | None -> lineIndexes
 
     let mutable lineIndexes =
         use file = accessfile true 
@@ -161,6 +161,19 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
             })
 
     member this.LineCount = lineIndexes.Length 
+
+    member this.Restriction 
+        with get () = restriction
+        and set value = restriction <- value
+
+    member this.SetRestrict restriction = 
+        this.Restriction <- restriction
+        lineIndexes <-
+            use file = accessfile true 
+            file
+            |> createLogIndexes 
+        ()
+
 
     member this.Refresh () = 
         let recentFileSize = fileSize

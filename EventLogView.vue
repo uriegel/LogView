@@ -43,7 +43,8 @@ export default Vue.extend({
         StopIcon
     },
     props: {
-        connectionUrl: String
+        connectionUrl: String,
+        eventBus: { type: Object, default: () => new Vue() },
     },
     watch: {
         connectionUrl: {
@@ -136,6 +137,15 @@ export default Vue.extend({
             }
             ws.send(JSON.stringify(msg))
         }
+    },
+    mounted() {
+        this.eventBus.$on('restrict', restriction => {
+            const msg = {
+                case: "SetRestriction",
+                fields: [{ restriction: restriction || null }]
+            }
+            ws.send(JSON.stringify(msg))
+        })
     },
     beforeDestroy() {
         if (ws)

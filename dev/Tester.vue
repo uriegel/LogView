@@ -1,6 +1,9 @@
 <template>
-    <event-log-view :connectionUrl="'ws://localhost:9866/logview'">
-    </event-log-view>
+    <div class="main"> 
+        <event-log-view :eventBus="logEventBus" :connectionUrl="'ws://localhost:9866/logview'">
+        </event-log-view>
+        <input type="input" v-model="restriction" @keydown='onInputKeyDown'>
+    </div>
 </template>
 
 <script>
@@ -18,6 +21,29 @@ export default Vue.extend({
     components: {
         EventLogView
     },
+    data() {
+        return {
+            logEventBus: new Vue(),
+            restriction: ""
+        }
+    },
+    methods: {
+        onInputKeyDown(evt) {
+            switch (evt.which) {
+                case 9: // TAB
+                    //this.focus()
+                    evt.stopPropagation()
+                    evt.preventDefault()
+                    break
+                case 13: // enter
+                    this.logEventBus.$emit("restrict", this.restriction)
+                    break
+                default:
+                    return // exit this handler for other keys
+            }
+            evt.preventDefault() // prevent
+        },        
+    }
 })
 </script>
 
@@ -54,5 +80,10 @@ body {
     padding: 0px;
     display: flex;
     color: #bbb;
+}
+.main  {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
 }
 </style>
