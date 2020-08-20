@@ -14,7 +14,8 @@
                         {{row.item.itemParts[0]}}
                     </td>
                     <td>{{row.item.itemParts[1]}}</td>
-                    <td>{{row.item.itemParts[2]}}</td>
+                    <td v-if="restrictions" v-html="getRestricted(row.item.itemParts[2])"></td>
+                    <td v-if="!restrictions">>{{row.item.itemParts[2]}}</td>
                 </tr>
             </template>
         </table-view>
@@ -83,7 +84,8 @@ export default Vue.extend({
                 count: 0,
                 indexToSelect: 0,
                 getItems: async () => await []
-            } 
+            },
+            restrictions: ["Cache"]
         }
     },
     methods: {
@@ -136,6 +138,21 @@ export default Vue.extend({
                 fields: [{ value }]
             }
             ws.send(JSON.stringify(msg))
+        },
+        getRestricted(item) {
+            const res = this.restrictions[0]
+            let index = item.indexOf(res)
+            if (index != -1) {
+                let item1 = item.substr(0, index)
+                let item2 = item.substr(index, res.length)
+                let item3 = item.substr(index + res.length)
+                const text =  item1 + "<span class='rot'>" + item2 +"</span>" + item3
+                console.log("eitem", item)
+                console.log(index, res, item1, item2, item3)
+                console.log("text", text)
+                return text
+            } else
+                return item
         }
     },
     mounted() {
@@ -153,7 +170,12 @@ export default Vue.extend({
     }    
 })
 </script>
-
+<style>
+.rot {
+    background-color: darkred;
+    color: white;
+}
+</style> 
 <style scoped>
 .root {
     display: flex;

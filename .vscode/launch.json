@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch Linux",
+            "name": ".NET Core Launch",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
@@ -14,15 +14,6 @@
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "internalConsole"
-        }, {
-            "name": ".NET Core Launch Windows",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}LogViewServer/Tester/bin/Debug/netcoreapp3.1/Tester.exe",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopAtEntry": false
         }
     ]
 }
