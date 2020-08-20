@@ -1,5 +1,6 @@
 <template>
     <div class="root">
+        <p v-html="getRestricted2('ProxyDas ist der schöne Proxy, der Proxy und der Proxy, nicht der roxy, sonder der Proxy22', 'roxy')"></p>
         <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'  
             @selection-changed="onSelectionChanged">
             <template v-slot=row >
@@ -140,20 +141,37 @@ export default Vue.extend({
             ws.send(JSON.stringify(msg))
         },
         getRestricted(item) {
-            const res = this.restrictions[0]
-            let index = item.indexOf(res)
-            if (index != -1) {
-                let item1 = item.substr(0, index)
-                let item2 = item.substr(index, res.length)
-                let item3 = item.substr(index + res.length)
-                const text =  item1 + "<span class='rot'>" + item2 +"</span>" + item3
-                console.log("eitem", item)
-                console.log(index, res, item1, item2, item3)
-                console.log("text", text)
-                return text
-            } else
+            // const res = this.restrictions[0]
+            // let index = item.indexOf(res)
+            // if (index != -1) {
+            //     let item1 = item.substr(0, index)
+            //     let item2 = item.substr(index, res.length)
+            //     let item3 = item.substr(index + res.length)
+            //     const text =  item1 + "<span class='rot'>" + item2 +"</span>" + item3
+            //     console.log("eitem", item)
+            //     console.log(index, res, item1, item2, item3)
+            //     console.log("text", text)
+            //     return text
+            // } else
                 return item
+        },
+        getRestricted2(item, res) {
+
+            function* split(str, sep) {
+                const seplen = sep.length
+                let pos = 0
+                while (true) {
+                    const index = item.indexOf(res, pos)
+                    yield item.substr(pos, index - pos >= 0 ? index - pos : undefined) 
+                    pos = index + seplen
+                    if (index == -1)
+                        break
+                }
+            }
+            const parts = Array.from(split(item, res))
+            return parts.join(`<span class='rot'>${res}</span>`)
         }
+
     },
     mounted() {
         this.eventBus.$on('restrict', restriction => {
@@ -172,7 +190,7 @@ export default Vue.extend({
 </script>
 <style>
 .rot {
-    background-color: darkred;
+    background-color: blue;
     color: white;
 }
 </style> 
