@@ -1,6 +1,5 @@
 <template>
     <div class="root">
-        <p v-html="getRestricted2('ProxyDas ist der schöne Proxy, der Proxy und der Proxy, nicht der roxy, sonder der Proxy22', 'roxy')"></p>
         <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'  
             @selection-changed="onSelectionChanged">
             <template v-slot=row >
@@ -16,7 +15,7 @@
                     </td>
                     <td>{{row.item.itemParts[1]}}</td>
                     <td v-if="restrictions" v-html="getRestricted(row.item.itemParts[2])"></td>
-                    <td v-if="!restrictions">>{{row.item.itemParts[2]}}</td>
+                    <td v-if="!restrictions">{{row.item.itemParts[2]}}</td>  
                 </tr>
             </template>
         </table-view>
@@ -86,7 +85,9 @@ export default Vue.extend({
                 indexToSelect: 0,
                 getItems: async () => await []
             },
-            restrictions: ["Cache"]
+            //restrictions: ["CAESAR Proxy status", "roxy", "User"]
+            //restrictions: ["CAESAR Proxy status"]
+            restrictions: []
         }
     },
     methods: {
@@ -141,37 +142,29 @@ export default Vue.extend({
             ws.send(JSON.stringify(msg))
         },
         getRestricted(item) {
-            // const res = this.restrictions[0]
-            // let index = item.indexOf(res)
-            // if (index != -1) {
-            //     let item1 = item.substr(0, index)
-            //     let item2 = item.substr(index, res.length)
-            //     let item3 = item.substr(index + res.length)
-            //     const text =  item1 + "<span class='rot'>" + item2 +"</span>" + item3
-            //     console.log("eitem", item)
-            //     console.log(index, res, item1, item2, item3)
-            //     console.log("text", text)
-            //     return text
-            // } else
-                return item
-        },
-        getRestricted2(item, res) {
-
-            function* split(str, sep) {
-                const seplen = sep.length
-                let pos = 0
-                while (true) {
-                    const index = item.indexOf(res, pos)
-                    yield item.substr(pos, index - pos >= 0 ? index - pos : undefined) 
-                    pos = index + seplen
-                    if (index == -1)
-                        break
+            function getRestricted(itemToRestrict, res) {
+                function* split(str, sep) {
+                    const seplen = sep.length
+                    let pos = 0
+                    while (true) {
+                        const index = itemToRestrict.item.indexOf(res, pos)
+                        yield itemToRestrict.item.substr(pos, index - pos >= 0 ? index - pos : undefined) 
+                        pos = index + seplen
+                        if (index == -1)
+                            break
+                    }
+                }
+                const parts = Array.from(split(itemToRestrict.item, res))
+                return { 
+                    item: parts.join(`<span class='event-log-vue-selected${itemToRestrict.index}'>${res}</span>`), 
+                    index: itemToRestrict.index <= 2 ? itemToRestrict.index + 1 : 3
                 }
             }
-            const parts = Array.from(split(item, res))
-            return parts.join(`<span class='rot'>${res}</span>`)
-        }
+            
+            const result = this.restrictions.reduce((acc, res) => getRestricted(acc, res), { item, index: 1 })
 
+            return result.item
+        }
     },
     mounted() {
         this.eventBus.$on('restrict', restriction => {
@@ -189,8 +182,15 @@ export default Vue.extend({
 })
 </script>
 <style>
-.rot {
-    background-color: blue;
+.event-log-vue-selected1 {
+    background-color: yellow;
+}
+.event-log-vue-selected2 {
+    background-color: red;
+    color: white;
+}
+.event-log-vue-selected3 {
+    background-color: green;
     color: white;
 }
 </style> 
