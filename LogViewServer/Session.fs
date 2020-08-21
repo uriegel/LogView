@@ -40,13 +40,14 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
     let mutable refreshMode = true
 
     let rec startRefresh () = 
-        async {
-            let lines = fileOperations.Refresh ()
-            if lines <> 0 then
-                send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-            do! Async.Sleep 100
-            if refreshMode then startRefresh ()
-        } |> Async.Start        
+        ()
+        // async {
+        //     let lines = fileOperations.Refresh ()
+        //     if lines <> 0 then
+        //         send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+        //     do! Async.Sleep 100
+        //     if refreshMode then startRefresh ()
+        // } |> Async.Start        
 
     let onReceive msg =
         match msg with
