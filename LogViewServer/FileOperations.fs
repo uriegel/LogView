@@ -12,16 +12,11 @@ type Line = {
 }
 
 type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) = 
-    let mutable fileSize = 0L
     let mutable restriction: string option = None
     let buffer = Array.zeroCreate 80000    
     let encoding = if utf8 then Encoding.UTF8 else Encoding.GetEncoding (CultureInfo.CurrentCulture.TextInfo.ANSICodePage)
-
-    let accessfile adjustLength = 
-        let file = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-        if adjustLength then
-            fileSize <-file.Length
-        file
+    let file = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+    let mutable fileSize = file.Length
 
     let getString (file: Stream) line =
         file.Position <- line.Pos
@@ -121,7 +116,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         | None -> lineIndexes
 
     let mutable lineIndexes =
-        use file = accessfile true 
         file
         |> createLogIndexes 
 
@@ -174,7 +168,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     member this.SetRestrict restriction = 
         this.Restriction <- restriction
         lineIndexes <-
-            use file = accessfile true 
             file
             |> createLogIndexes 
         ()
@@ -182,7 +175,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
     member this.Refresh () = 
         let recentFileSize = fileSize
-        use file = accessfile true 
+        fileSize <- file.Length
         if recentFileSize < fileSize then
             file.Position <- recentFileSize
             let newLines =
@@ -201,7 +194,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
             0
 
     member this.GetLines startIndex endIndex = 
-        use file = accessfile false
         getLines file startIndex endIndex
         |> Seq.toArray
         
