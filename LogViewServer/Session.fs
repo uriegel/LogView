@@ -19,8 +19,8 @@ type SetRestriction = {
 
 type Message =
     | GetItems of GetItems
-    | SetRefreshMode of SetRefreshMode
     | SetRestriction of SetRestriction
+    | Refresh
 
 type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) = 
     let fileOperations = FileOperations (logFilePath, formatMilliseconds, utf8)
@@ -37,32 +37,23 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         loop ()  
     )    
 
-    let mutable refreshMode = true
-
-    let rec startRefresh () = 
-        ()
-        // async {
-        //     let lines = fileOperations.Refresh ()
-        //     if lines <> 0 then
-        //         send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-        //     do! Async.Sleep 100
-        //     if refreshMode then startRefresh ()
-        // } |> Async.Start        
-
+    let refresh () =
+        let lines = fileOperations.Refresh ()
+        if lines <> 0 then
+            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+    
     let onReceive msg =
         match msg with
         | GetItems getItems -> getItemsQueue.Post getItems   
-        | SetRefreshMode setRefreshMode -> 
-            refreshMode <- setRefreshMode.Value
-            if refreshMode then startRefresh ()
         | SetRestriction setRestriction ->
             printfn "Restriction %O" setRestriction.Restriction 
             fileOperations.SetRestrict setRestriction.Restriction
             let lines = fileOperations.LineCount
             send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-            match setRestriction.Restriction with
-            | Some _ -> startRefresh ()
-            | None -> refreshMode <- false
+            // match setRestriction.Restriction with
+            // | Some _ -> ()
+            // | None -> refreshMode <- false
+        | Refresh -> refresh ()
 
     static do 
         Encoding.RegisterProvider CodePagesEncodingProvider.Instance |> ignore
@@ -82,5 +73,4 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         send <- sendToSet 
         let lines = fileOperations.LineCount
         send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-        startRefresh ()
    

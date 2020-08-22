@@ -1,5 +1,5 @@
 <template>
-    <div class="root">
+    <div class="root" @focus=focus @keydown=keydown>
         <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'  
             @selection-changed="onSelectionChanged">
             <template v-slot=row >
@@ -54,18 +54,11 @@ export default Vue.extend({
                 if (newVal)
                     this.runEvents()
             }
-        },
-        refreshMode: {
-            immediate: true,
-            handler(newVal) {
-                this.setRefresh(newVal)
-            }
         }
     },
     data() {
         return {
             tableEventBus: new Vue(),
-            refreshMode: false,
             selectedIndex: 0,
             columns: [
                 {
@@ -90,19 +83,36 @@ export default Vue.extend({
             restrictions: []
         }
     },
+    mounted() {
+
+        // const f5$ = this.keyDown$.pipe(filter(n => !n.event.which == 116))
+        // this.$subscribeTo(f5$, () => console.log("rifreysch"))
+
+        this.eventBus.$on('restrict', restriction => {
+            const msg = {
+                case: "SetRestriction",
+                fields: [{ restriction: restriction || null }]
+            }
+            ws.send(JSON.stringify(msg))
+        })
+    },
     methods: {
         runEvents() {
-            ws = new WebSocket(this.connectionUrl)
+            const webSocket = new WebSocket(this.connectionUrl)
             let resolves = new Map()
-            ws.onmessage = m => {
+            webSocket.onopen = () => {
+                ws = webSocket
+                this.focus()
+            }
+            webSocket.onmessage = m => {
                 let msg = JSON.parse(m.data) 
                 const getItems = async (startRange, endRange) => {
-                    return new Promise((res) => {
+                    return new Promise((res, rej) => {
                         const msg = {
                             case: "GetItems",
                             fields: [{ reqId: ++reqId, startRange, endRange:Math.min(endRange, this.itemsSource.count - 1)}]
                         }
-                        resolves.set(reqId, res)
+                        resolves.set(reqId, {res, rej})
                         ws.send(JSON.stringify(msg))
                     })
                 }
@@ -113,7 +123,7 @@ export default Vue.extend({
                         this.itemsSource = { 
                             count: itemsSource.count || 0, 
                             getItems, 
-                            indexToSelect: this.refreshMode ? itemsSource.indexToSelect : -1
+                            indexToSelect: itemsSource.indexToSelect
                         }
                         break
                     }
@@ -123,7 +133,12 @@ export default Vue.extend({
                         let resolve = resolves.get(items.reqId)
                         if (resolve) {
                             resolves.delete(items.reqId)
-                            resolve(items.items)
+                            // Very important!!!!!!
+                            // process only up to 50 request in order to avoid overfloyed queue
+                            if (items.reqId < reqId + 50)
+                                resolve.res(items.items)
+                            else
+                                resolve.rej()
                         }
                         break      
                     }              
@@ -132,14 +147,18 @@ export default Vue.extend({
         },
         onSelectionChanged(index) { 
             this.selectedIndex = index 
-            this.refreshMode = this.selectedIndex == this.itemsSource.count - 1
         },
-        setRefresh(value) {
-            const msg = {
-                case: "SetRefreshMode",
-                fields: [{ value }]
+        focus() { this.tableEventBus.$emit("focus") },
+        keydown(evt) {
+            if (evt.which == 116) {
+                evt.stopPropagation()
+                evt.preventDefault()                
+                const msg = {
+                    case: "Refresh"
+                }
+                if (ws)
+                    ws.send(JSON.stringify(msg))
             }
-            ws.send(JSON.stringify(msg))
         },
         getRestricted(item) {
             function getRestricted(itemToRestrict, res) {
@@ -165,15 +184,6 @@ export default Vue.extend({
 
             return result.item
         }
-    },
-    mounted() {
-        this.eventBus.$on('restrict', restriction => {
-            const msg = {
-                case: "SetRestriction",
-                fields: [{ restriction: restriction || null }]
-            }
-            ws.send(JSON.stringify(msg))
-        })
     },
     beforeDestroy() {
         if (ws)

@@ -4,7 +4,6 @@ open System.Text
 open FSharpTools
 open FSharpTools.String
 open System.Globalization
-open System
 
 type Line = {
     Pos: int64
@@ -32,6 +31,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         let buffer = Array.zeroCreate 20000
 
         let getLines () =
+            let startOffset = file.Position
             let getLinesBuffer () =
                 let fileOffset = file.Position
                 if fileOffset < file.Length then
@@ -60,7 +60,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                     | None -> None) 
                 |> Seq.concat
                 |> Seq.toArray
-            let indexes = Array.concat [ [|0L|]; indexes ]
+            let indexes = Array.concat [ [|startOffset|]; indexes ]
 
             seq { for i in 1 .. indexes.Length - 1 -> { Pos = indexes.[i-1]; Length = int (indexes.[i] - indexes.[i-1]) }}                
             |> Seq.toArray
@@ -171,7 +171,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
             file
             |> createLogIndexes 
         ()
-
 
     member this.Refresh () = 
         let recentFileSize = fileSize
