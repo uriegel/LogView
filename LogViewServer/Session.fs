@@ -59,7 +59,7 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         onReceive msg
 
     member this.OnReceive payload =
-        let msg = Json.deserialize<Message> payload 
+        let msg = Json.deserializeWithOptions<Message> payload 
         onReceive msg
 
     member this.OnClose () =
