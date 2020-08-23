@@ -46,13 +46,9 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         match msg with
         | GetItems getItems -> getItemsQueue.Post getItems   
         | SetRestriction setRestriction ->
-            printfn "Restriction %O" setRestriction.Restriction 
             fileOperations.SetRestrict setRestriction.Restriction
             let lines = fileOperations.LineCount
             send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-            // match setRestriction.Restriction with
-            // | Some _ -> ()
-            // | None -> refreshMode <- false
         | Refresh -> refresh ()
 
     static do 

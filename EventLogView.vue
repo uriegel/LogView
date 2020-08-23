@@ -19,6 +19,7 @@
                 </tr>
             </template>
         </table-view>
+        <input type="input" v-model="restriction" @keydown='onInputKeyDown'>
     </div>
 </template>
 
@@ -78,23 +79,9 @@ export default Vue.extend({
                 indexToSelect: 0,
                 getItems: async () => await []
             },
-            //restrictions: ["CAESAR Proxy status", "roxy", "User"]
-            //restrictions: ["CAESAR Proxy status"]
+            restriction: "",
             restrictions: []
         }
-    },
-    mounted() {
-
-        // const f5$ = this.keyDown$.pipe(filter(n => !n.event.which == 116))
-        // this.$subscribeTo(f5$, () => console.log("rifreysch"))
-
-        this.eventBus.$on('restrict', restriction => {
-            const msg = {
-                case: "SetRestriction",
-                fields: [{ restriction: restriction || null }]
-            }
-            ws.send(JSON.stringify(msg))
-        })
     },
     methods: {
         runEvents() {
@@ -160,6 +147,32 @@ export default Vue.extend({
                     ws.send(JSON.stringify(msg))
             }
         },
+        onInputKeyDown(evt) {
+            switch (evt.which) {
+                case 9: // TAB
+                    this.focus()
+                    evt.stopPropagation()
+                    evt.preventDefault()
+                    break
+                case 13: { // enter
+                    const msg = {
+                        case: "SetRestriction",
+                        fields: [{ restriction: this.restriction || null }]
+                    }
+                    ws.send(JSON.stringify(msg))
+
+                    this.restrictions = this.restriction
+                        ? this.restriction.split("|")
+                        : []
+
+                    this.focus()
+                    break
+                }
+                default:
+                    return // exit this handler for other keys
+            }
+            evt.preventDefault() // prevent
+        },        
         getRestricted(item) {
             function getRestricted(itemToRestrict, res) {
                 function* split(str, sep) {

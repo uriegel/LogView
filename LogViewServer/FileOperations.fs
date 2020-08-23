@@ -67,8 +67,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
         let lineIndexes = getLines ()
 
-        printfn "get start"
-
         match restriction with
         | Some restriction -> 
             let searchStrings = 
@@ -111,7 +109,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 lineIndexes 
                 |> Array.filter filter
 
-            printfn "get end"
             lineIndexes
         | None -> lineIndexes
 
@@ -167,6 +164,8 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
     member this.SetRestrict restriction = 
         this.Restriction <- restriction
+        fileSize <- file.Length
+        file.Position <- 0L
         lineIndexes <-
             file
             |> createLogIndexes 
