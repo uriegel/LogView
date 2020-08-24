@@ -81,6 +81,7 @@ export default Vue.extend({
             },
             restriction: "",
             restrictions: [],
+            restricted: false,
             selectedLineIndex: -1
         }
     },
@@ -136,7 +137,7 @@ export default Vue.extend({
         onSelectionChanged(index, item) { 
             this.selectedIndex = index 
             this.selectedLineIndex = item ? item.lineIndex : -1
-            console.log("Selektion tschänscht")
+            console.log("Selektion tschänscht", index, this.selectedLineIndex)
         },
         focus() { this.tableEventBus.$emit("focus") },
         keydown(evt) {
@@ -150,15 +151,15 @@ export default Vue.extend({
                     ws.send(JSON.stringify(msg))
                     break
                 }
-                case 120: {                   
+                case 120: {       
+                    this.restricted = !this.restricted            
                     const msg = {
                         case: "SetRestriction",
-                        fields: [{ restriction: null, selectedIndex: this.selectedLineIndex }]
+                        fields: [{ 
+                            restriction: this.restricted ? this.restriction : null, 
+                            selectedIndex: this.selectedLineIndex 
+                        }]
                     }
-
-
-console.log("Toggel", this.selectedIndex)
-
                     ws.send(JSON.stringify(msg))                    
                     break
                 }
@@ -172,6 +173,7 @@ console.log("Toggel", this.selectedIndex)
                     evt.preventDefault()
                     break
                 case 13: { // enter
+                    this.restricted = true
                     const msg = {
                         case: "SetRestriction",
                         fields: [{ restriction: this.restriction || null }]
