@@ -6,6 +6,7 @@ open FSharpTools.String
 open System.Globalization
 
 type Line = {
+    Index: int
     Pos: int64
     Length: int
 }
@@ -62,7 +63,13 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 |> Seq.toArray
             let indexes = Array.concat [ [|startOffset|]; indexes ]
 
-            seq { for i in 1 .. indexes.Length - 1 -> { Pos = indexes.[i-1]; Length = int (indexes.[i] - indexes.[i-1]) }}                
+            seq { 
+                for i in 1 .. indexes.Length - 1 -> { 
+                    Index = i - 1 
+                    Pos = indexes.[i-1]
+                    Length = int (indexes.[i] - indexes.[i-1]) 
+                }
+            }                
             |> Seq.toArray
 
         let lineIndexes = getLines ()
@@ -152,6 +159,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 | _ -> MsgType.NewLine
             {
                 Index = i
+                LineIndex = n.Index
                 ItemParts = getItemParts text msgType
                 MsgType = msgType
             })

@@ -15,6 +15,7 @@ type SetRefreshMode = {
 
 type SetRestriction = {
     Restriction: string option
+    SelectedIndex: int option
 }
 
 type Message =
@@ -48,7 +49,11 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         | SetRestriction setRestriction ->
             fileOperations.SetRestrict setRestriction.Restriction
             let lines = fileOperations.LineCount
-            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+            let selectedIndex = 
+                match setRestriction.SelectedIndex with
+                | Some index -> index
+                | None -> 0 // lines - 1
+            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = selectedIndex |} 
         | Refresh -> refresh ()
 
     static do 

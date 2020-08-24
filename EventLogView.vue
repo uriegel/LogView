@@ -80,7 +80,8 @@ export default Vue.extend({
                 getItems: async () => await []
             },
             restriction: "",
-            restrictions: []
+            restrictions: [],
+            selectedLineIndex: -1
         }
     },
     methods: {
@@ -132,19 +133,35 @@ export default Vue.extend({
                 }
             }
         },
-        onSelectionChanged(index) { 
+        onSelectionChanged(index, item) { 
             this.selectedIndex = index 
+            this.selectedLineIndex = item ? item.lineIndex : -1
+            console.log("Selektion tschänscht")
         },
         focus() { this.tableEventBus.$emit("focus") },
         keydown(evt) {
-            if (evt.which == 116) {
-                evt.stopPropagation()
-                evt.preventDefault()                
-                const msg = {
-                    case: "Refresh"
-                }
-                if (ws)
+            switch (evt.which) {
+                case 116: {
+                    evt.stopPropagation()
+                    evt.preventDefault()                
+                    const msg = {
+                        case: "Refresh"
+                    }
                     ws.send(JSON.stringify(msg))
+                    break
+                }
+                case 120: {                   
+                    const msg = {
+                        case: "SetRestriction",
+                        fields: [{ restriction: null, selectedIndex: this.selectedLineIndex }]
+                    }
+
+
+console.log("Toggel", this.selectedIndex)
+
+                    ws.send(JSON.stringify(msg))                    
+                    break
+                }
             }
         },
         onInputKeyDown(evt) {
