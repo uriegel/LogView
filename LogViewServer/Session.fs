@@ -50,9 +50,10 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
             fileOperations.SetRestrict setRestriction.Restriction
             let lines = fileOperations.LineCount
             let selectedIndex = 
-                match setRestriction.SelectedIndex with
-                | Some index -> index
-                | None -> 0 // lines - 1
+                match setRestriction.SelectedIndex, setRestriction.Restriction with
+                | Some index, Some _ -> 1
+                | Some index, None -> index
+                | None, _ -> 0 // lines - 1
             send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = selectedIndex |} 
         | Refresh -> refresh ()
 

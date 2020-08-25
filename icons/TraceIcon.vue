@@ -3,7 +3,7 @@
    viewBox="0 0 12600.000000 12800.000000"
    preserveAspectRatio="xMidYMid meet"
    version="1.1">
-<g transform="translate(2000.000000,10000.000000) scale(0.70000,-0.70000)"
+<g transform="translate(400.000000,8000.000000) scale(0.70000,-.70000) rotate(-30)"
  stroke="none">
 <path d="M8503 12789 c-785 -121 -1485 -911 -1748 -1972 -66 -268 -93 -473
 -102 -762 -13 -456 64 -875 232 -1247 98 -217 210 -383 365 -538 205 -205 415

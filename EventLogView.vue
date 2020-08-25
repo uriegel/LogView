@@ -157,7 +157,7 @@ export default Vue.extend({
                         case: "SetRestriction",
                         fields: [{ 
                             restriction: this.restricted ? this.restriction : null, 
-                            selectedIndex: this.selectedLineIndex 
+                            selectedIndex: this.restricted ? this.selectedIndex : this.selectedLineIndex
                         }]
                     }
                     ws.send(JSON.stringify(msg))                    
