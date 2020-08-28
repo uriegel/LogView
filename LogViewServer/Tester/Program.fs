@@ -12,10 +12,10 @@ let mutable sessionHolder: Session Option = None
 
 let initialize (socketSession: Types.Session) = 
     //let session = Session ("/home/uwe/LogTest/test.log", false, true) //session.LoadLogFile "/home/uwe/LogTest/testm.log"
-    //let session = Session ("/home/uwe/LogTest/CaesarProxy.log", false, false)
+    let session = Session ("/home/uwe/LogTest/CaesarProxy.log", false, false)
     //let session = Session ("/home/uwe/LogTest/CaesarProxy2.log", true, false)
     //let session = Session ("/home/uwe/LogTest/klein.log", true, false)
-    let session = Session (@"C:\ProgramData\caesar\Proxy\log\CaesarProxy.log", true, false)
+    //let session = Session (@"C:\ProgramData\caesar\Proxy\log\CaesarProxy.log", true, false)
     
     sessionHolder <- Some session 
     let onReceive (stream: Stream) = session.OnReceive stream

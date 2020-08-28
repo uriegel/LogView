@@ -137,7 +137,7 @@ export default Vue.extend({
         onSelectionChanged(index, item) { 
             this.selectedIndex = index 
             this.selectedLineIndex = item ? item.lineIndex : -1
-            console.log("Selektion tschänscht", index, this.selectedLineIndex)
+            console.log("Selektion tschänscht i sel items item", index, this.selectedLineIndex, item)
         },
         focus() { this.tableEventBus.$emit("focus") },
         keydown(evt) {

@@ -47,13 +47,8 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         match msg with
         | GetItems getItems -> getItemsQueue.Post getItems   
         | SetRestriction setRestriction ->
-            fileOperations.SetRestrict setRestriction.Restriction
+            let selectedIndex = fileOperations.SetRestrict setRestriction.Restriction setRestriction.SelectedIndex
             let lines = fileOperations.LineCount
-            let selectedIndex = 
-                match setRestriction.SelectedIndex, setRestriction.Restriction with
-                | Some index, Some _ -> 1
-                | Some index, None -> index
-                | None, _ -> 0 // lines - 1
             send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = selectedIndex |} 
         | Refresh -> refresh ()
 

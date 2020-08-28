@@ -124,6 +124,8 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         |> createLogIndexes 
 
     let getLines (file: Stream) startIndex endIndex =
+        let startIndex = max 0 startIndex 
+        let endIndex = max 0 endIndex
         let posType = if formatMilliseconds then 24 else 20
         let timeLength = if formatMilliseconds then 12 else 8
         let textPos = if formatMilliseconds then 29 else 25
@@ -170,14 +172,18 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         with get () = restriction
         and set value = restriction <- value
 
-    member this.SetRestrict restriction = 
+    member this.SetRestrict restriction indexToSelect = 
         this.Restriction <- restriction
         fileSize <- file.Length
         file.Position <- 0L
         lineIndexes <-
             file
             |> createLogIndexes 
-        ()
+        match indexToSelect, restriction with
+        | None, _ -> 0
+        | Some index, None -> index    
+        | Some index, Some _ -> 
+            lineIndexes |> Array.findIndex (fun n -> n.Index = index)
 
     member this.Refresh () = 
         let recentFileSize = fileSize
