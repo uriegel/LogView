@@ -183,7 +183,20 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         | None, _ -> 0
         | Some index, None -> index    
         | Some index, Some _ -> 
-            lineIndexes |> Array.findIndex (fun n -> n.Index = index)
+            match lineIndexes |> Array.tryFindIndex (fun n -> n.Index = index) with
+            | Some value -> value
+            | None -> 
+                let sel = lineIndexes |> Array.tryFindIndex (fun n -> n.Index > index)
+                match sel with
+                | Some 0 -> 0
+                | Some sel -> 
+                    let first = lineIndexes.[sel-1]
+                    let sec = lineIndexes.[sel]
+                    if index - first.Index < sec.Index - index then
+                        sel - 1
+                    else
+                        sel
+                | None -> lineIndexes.Length - 1
 
     member this.Refresh () = 
         let recentFileSize = fileSize
