@@ -19,9 +19,12 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     let mutable fileSize = file.Length
 
     let getString (file: Stream) line =
-        file.Position <- line.Pos
-        file.Read (buffer, 0, line.Length) |> ignore
-        encoding.GetString (buffer, 0, line.Length)
+        if line.Length > 0 then
+            file.Position <- line.Pos
+            file.Read (buffer, 0, line.Length) |> ignore
+            encoding.GetString (buffer, 0, line.Length)
+        else
+            ""
 
     let getRawLine (file: Stream) line =
         file.Position <- line.Pos

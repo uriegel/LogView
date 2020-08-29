@@ -55,7 +55,13 @@ export default Vue.extend({
                 if (newVal)
                     this.runEvents()
             }
-        }
+        },
+        refreshMode: {
+            immediate: true,
+            handler(newVal) {
+                this.setRefresh(newVal)
+            }
+        }        
     },
     data() {
         return {
@@ -82,7 +88,8 @@ export default Vue.extend({
             restriction: "",
             restrictions: [],
             restricted: false,
-            selectedLineIndex: -1
+            selectedLineIndex: -1,
+            refreshMode: false
         }
     },
     methods: {
@@ -118,7 +125,6 @@ export default Vue.extend({
                     }
                     case 2: {
                         const items = msg
-                        console.log("items", items, this.itemsSource.count)
                         let resolve = resolves.get(items.reqId)
                         if (resolve) {
                             resolves.delete(items.reqId)
@@ -137,20 +143,11 @@ export default Vue.extend({
         onSelectionChanged(index, item) { 
             this.selectedIndex = index 
             this.selectedLineIndex = item ? item.lineIndex : -1
-            console.log("Selektion tschänscht i sel items item", index, this.selectedLineIndex, item)
+            this.refreshMode = this.selectedIndex == this.itemsSource.count - 1
         },
         focus() { this.tableEventBus.$emit("focus") },
         keydown(evt) {
             switch (evt.which) {
-                case 116: {
-                    evt.stopPropagation()
-                    evt.preventDefault()                
-                    const msg = {
-                        case: "Refresh"
-                    }
-                    ws.send(JSON.stringify(msg))
-                    break
-                }
                 case 120: {       
                     this.restricted = !this.restricted            
                     const msg = {
@@ -215,7 +212,14 @@ export default Vue.extend({
             const result = this.restrictions.reduce((acc, res) => getRestricted(acc, res), { item, index: 1 })
 
             return result.item
-        }
+        },
+        setRefresh(value) {
+            const msg = {
+                case: "SetRefreshMode",
+                fields: [{ value }]
+            }
+            ws.send(JSON.stringify(msg))
+        }        
     },
     beforeDestroy() {
         if (ws)
