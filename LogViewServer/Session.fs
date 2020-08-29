@@ -39,9 +39,11 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
     )    
 
     let refresh () =
-        let lines = fileOperations.Refresh ()
-        if lines <> 0 then
-            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+        try 
+            let lines = fileOperations.Refresh ()
+            if lines <> 0 then
+                send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+        with _ -> ()
     
     let mutable refreshMode = true
 
