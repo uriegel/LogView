@@ -5,7 +5,8 @@
             <template v-slot=row >
                 <tr :class="{ 'isCurrent': row.item.index == selectedIndex || (selectedIndex == 0 && !row.item.index)}">
                     <td class="icon-name">
-                        <trace-icon v-if="row.item.msgType == 1" class="svg icon"></trace-icon> 
+                        <!-- <trace-icon v-if="row.item.msgType == 1" class="svg icon"></trace-icon>  -->
+                        <img src="./trace.svg" v-if="row.item.msgType == 1" class="svg icon">
                         <info-icon v-if="row.item.msgType == 2" class="svg icon"></info-icon> 
                         <warning-icon v-if="row.item.msgType == 3" class="svg icon"></warning-icon> 
                         <error-icon v-if="row.item.msgType == 4" class="svg icon"></error-icon>
@@ -26,7 +27,7 @@
 <script>
 import Vue from 'vue'
 import NewLineIcon from './icons/NewLineIcon.vue'
-import TraceIcon from './icons/TraceIcon.vue'
+//import TraceIcon from './icons/TraceIcon.vue'
 import InfoIcon from './icons/InfoIcon.vue'
 import WarningIcon from './icons/WarningIcon.vue'
 import ErrorIcon from './icons/ErrorIcon.vue'
@@ -38,7 +39,7 @@ var ws
 export default Vue.extend({
     components: {
         NewLineIcon,
-        TraceIcon,
+        //TraceIcon,
         InfoIcon,
         WarningIcon,
         ErrorIcon,
