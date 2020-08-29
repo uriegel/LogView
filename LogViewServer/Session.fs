@@ -57,10 +57,12 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         | SetRefreshMode setRefreshMode -> 
             timer.Enabled <- setRefreshMode.Value
 
+    let timerHandler = Timers.ElapsedEventHandler(fun _ __ -> refresh ())
+
     static do 
         Encoding.RegisterProvider CodePagesEncodingProvider.Instance |> ignore
     do
-        timer.Elapsed.AddHandler (Timers.ElapsedEventHandler(fun _ __ -> refresh ()))
+        timer.Elapsed.AddHandler timerHandler
 
     member this.OnReceive payload =
         let msg = Json.deserializeStreamWithOptions<Message> payload
@@ -72,6 +74,7 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
 
     member this.OnClose () = 
         timer.Enabled <- false
+        timer.Elapsed.RemoveHandler timerHandler
         timer.Dispose ()
 
     member this.Initialize(sendToSet: Action<obj>) =
