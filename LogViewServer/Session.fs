@@ -38,6 +38,8 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         loop ()  
     )    
 
+    let timer = new System.Timers.Timer 500.0
+    
     let refresh () =
         try 
             let lines = fileOperations.Refresh ()
@@ -45,18 +47,6 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
                 send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
         with _ -> ()
     
-    let mutable refreshMode = true
-
-    let rec startRefresh () = doRefresh ()
-
-    and doRefresh () = 
-        async {
-            do! Async.Sleep 500
-            if refreshMode then
-                refresh ()
-                startRefresh ()
-        } |> Async.Start        
-
     let onReceive msg =
         match msg with
         | GetItems getItems -> getItemsQueue.Post getItems   
@@ -65,11 +55,12 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
             let lines = fileOperations.LineCount
             send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = selectedIndex |} 
         | SetRefreshMode setRefreshMode -> 
-            refreshMode <- setRefreshMode.Value
-            if refreshMode then startRefresh ()
+            timer.Enabled <- setRefreshMode.Value
 
     static do 
         Encoding.RegisterProvider CodePagesEncodingProvider.Instance |> ignore
+    do
+        timer.Elapsed.AddHandler (Timers.ElapsedEventHandler(fun _ __ -> refresh ()))
 
     member this.OnReceive payload =
         let msg = Json.deserializeStreamWithOptions<Message> payload
@@ -79,8 +70,9 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         let msg = Json.deserializeWithOptions<Message> payload 
         onReceive msg
 
-    member this.OnClose () =
-        ()
+    member this.OnClose () = 
+        timer.Enabled <- false
+        timer.Dispose ()
 
     member this.Initialize(sendToSet: Action<obj>) =
         send <- sendToSet 
