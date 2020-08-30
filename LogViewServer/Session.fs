@@ -18,10 +18,15 @@ type SetRestriction = {
     SelectedIndex: int option
 }
 
+type SetMinimalType = {
+    MinimalType: MinimalType
+}
+
 type Message =
     | GetItems of GetItems
     | SetRestriction of SetRestriction
     | SetRefreshMode of SetRefreshMode
+    | SetMinimalType of SetMinimalType
 
 type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) = 
     let fileOperations = FileOperations (logFilePath, formatMilliseconds, utf8)
@@ -57,6 +62,10 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
             send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = selectedIndex |} 
         | SetRefreshMode setRefreshMode -> 
             timer.Enabled <- setRefreshMode.Value
+        | SetMinimalType setMinimalType ->
+            fileOperations.SetMinimalType setMinimalType.MinimalType
+            let lines = fileOperations.LineCount
+            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = 0 |} 
 
     let timerHandler = Timers.ElapsedEventHandler(fun _ __ -> refresh ())
 

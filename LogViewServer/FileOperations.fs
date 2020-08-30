@@ -13,6 +13,7 @@ type Line = {
 
 type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) = 
     let mutable restriction: string option = None
+    let mutable minimalType = MinimalType.Trace
     let buffer = Array.zeroCreate 80000    
     let encoding = if utf8 then Encoding.UTF8 else Encoding.GetEncoding (CultureInfo.CurrentCulture.TextInfo.ANSICodePage)
     let file = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
@@ -102,15 +103,15 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
             let error = encoding.GetBytes "ERROR"
             let fatal = encoding.GetBytes "FATAL"
 
-            if minimalType = MsgType.Trace then
+            if minimalType = MinimalType.Trace then
                 indexes
             else
                 let types = 
                     match minimalType with 
-                    | MsgType.Info -> [| info; warni; error; fatal |]
-                    | MsgType.Warning -> [| warni; error; fatal |]
-                    | MsgType.Error -> [| error; fatal |]
-                    | MsgType.Fatal -> [| fatal |]
+                    | MinimalType.Info -> [| info; warni; error; fatal |]
+                    | MinimalType.Warning -> [| warni; error; fatal |]
+                    | MinimalType.Error -> [| error; fatal |]
+                    | MinimalType.Fatal -> [| fatal |]
                     | _ -> [| |]
 
                 let filter line = 
@@ -169,7 +170,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 lineIndexes
             | None -> indexes
         
-        let typedIndexes = restrictType lineIndexes MsgType.Warning
+        let typedIndexes = restrictType lineIndexes minimalType
         restrict typedIndexes
 
     let mutable lineIndexes =
@@ -249,6 +250,14 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                     else
                         sel
                 | None -> lineIndexes.Length - 1
+
+    member this.SetMinimalType newMinimalType = 
+        minimalType <- newMinimalType
+        fileSize <- file.Length
+        file.Position <- 0L
+        lineIndexes <-
+            file
+            |> createLogIndexes 
 
     member this.Refresh () = 
         let recentFileSize = fileSize

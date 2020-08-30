@@ -210,6 +210,12 @@ export default Vue.extend({
                 this.logType++
                 if (this.logType == 5)
                     this.logType = 0
+
+                const msg = {
+                    case: "SetMinimalType",
+                    fields: [{ minimalType: this.logType }]
+                }
+                ws.send(JSON.stringify(msg))
             }
         },  
         getRestricted(item) {
@@ -289,7 +295,6 @@ export default Vue.extend({
     display: inline;
     margin-right: 3px;
     vertical-align: bottom;
-    height: 16px;
 }
 .col {
     padding-left: 5px;

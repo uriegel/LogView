@@ -13,9 +13,18 @@ type MsgType =
 | Fatal = 5
 | NewLine = 6
 
+type MinimalType = 
+| Trace = 0 
+| Info = 1
+| Warning = 2
+| Error = 3
+| Fatal = 4
+
 type LineItem = {
     Index: int
     LineIndex: int
     ItemParts: string array
     MsgType: MsgType
 }
+
+   
