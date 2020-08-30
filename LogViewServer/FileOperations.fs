@@ -26,6 +26,8 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         else
             ""
 
+    let posType = if formatMilliseconds then 24 else 20
+
     let getRawLine (file: Stream) line =
         file.Position <- line.Pos
         file.Read (buffer, 0, line.Length) |> ignore
@@ -77,50 +79,98 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
         let lineIndexes = getLines ()
 
-        match restriction with
-        | Some restriction -> 
-            let searchStrings = 
-                restriction
-                |> String.splitChar '|'
-                |> Array.map encoding.GetBytes
-            
-            let getLine = getRawLine file
+        let getLine = getRawLine file
 
-            let findSearchStr (buffer: byte array) (searchBuffer: byte array) length =
-                let rec compare index pos =
-                    if pos = searchBuffer.Length then
-                        true
-                    else
-                        if buffer.[index + pos] = searchBuffer.[pos] then 
-                            compare index (pos + 1)
-                        else
+        let compareBinary line pos (value: byte array)  =
+            let rawLine, length = getLine line 
+            if length >= value.Length + pos then
+                let rec compare index =
+                    if index < value.Length then
+                        if rawLine.[pos + index] <> value.[index] then
                             false
-
-                let rec compareFirst pos =
-                    if pos >= length - searchBuffer.Length then
-                        false
-                    else
-                        if buffer.[pos] = searchBuffer.[0] then 
-                            //Some pos
-                            if compare pos 0 then
-                                true
-                            else 
-                                compareFirst (pos + 1)
                         else
-                            compareFirst (pos + 1)
+                            compare (index + 1)
+                    else
+                        true
+                compare 0
+            else
+                false
 
-                compareFirst 0 
+        let restrictType indexes minimalType = 
+            let info = encoding.GetBytes "INFO "
+            let warni = encoding.GetBytes "WARNI"
+            let error = encoding.GetBytes "ERROR"
+            let fatal = encoding.GetBytes "FATAL"
 
-            let filter line = 
-                let rawLine, length = getLine line 
-                searchStrings |> Array.filter (fun n -> findSearchStr rawLine n length) |> Array.length > 0
+            if minimalType = MsgType.Trace then
+                indexes
+            else
+                let types = 
+                    match minimalType with 
+                    | MsgType.Info -> [| info; warni; error; fatal |]
+                    | MsgType.Warning -> [| warni; error; fatal |]
+                    | MsgType.Error -> [| error; fatal |]
+                    | MsgType.Fatal -> [| fatal |]
+                    | _ -> [| |]
 
-            let lineIndexes = 
-                lineIndexes 
+                let filter line = 
+                    let res =
+                        types 
+                        |> Seq.map (compareBinary line posType )
+                        |> Seq.tryFind id 
+                    match res with
+                    | Some true -> true
+                    | _ -> false
+
+                indexes 
                 |> Array.filter filter
 
-            lineIndexes
-        | None -> lineIndexes
+        let restrict indexes = 
+            match restriction with
+            | Some restriction -> 
+                let searchStrings = 
+                    restriction
+                    |> String.splitChar '|'
+                    |> Array.map encoding.GetBytes
+                
+                let findSearchStr (buffer: byte array) (searchBuffer: byte array) length =
+                    let rec compare index pos =
+                        if pos = searchBuffer.Length then
+                            true
+                        else
+                            if buffer.[index + pos] = searchBuffer.[pos] then 
+                                compare index (pos + 1)
+                            else
+                                false
+
+                    let rec compareFirst pos =
+                        if pos >= length - searchBuffer.Length then
+                            false
+                        else
+                            if buffer.[pos] = searchBuffer.[0] then 
+                                //Some pos
+                                if compare pos 0 then
+                                    true
+                                else 
+                                    compareFirst (pos + 1)
+                            else
+                                compareFirst (pos + 1)
+
+                    compareFirst 0 
+
+                let filter line = 
+                    let rawLine, length = getLine line 
+                    searchStrings |> Array.filter (fun n -> findSearchStr rawLine n length) |> Array.length > 0
+
+                let lineIndexes = 
+                    indexes 
+                    |> Array.filter filter
+
+                lineIndexes
+            | None -> indexes
+        
+        let typedIndexes = restrictType lineIndexes MsgType.Warning
+        restrict typedIndexes
 
     let mutable lineIndexes =
         file
@@ -129,7 +179,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     let getLines (file: Stream) startIndex endIndex =
         let startIndex = max 0 startIndex 
         let endIndex = max 0 endIndex
-        let posType = if formatMilliseconds then 24 else 20
         let timeLength = if formatMilliseconds then 12 else 8
         let textPos = if formatMilliseconds then 29 else 25
 

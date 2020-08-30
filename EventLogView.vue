@@ -4,17 +4,19 @@
             @selection-changed="onSelectionChanged" @column-click='onColumn'>
 
             <template v-slot:col0>
-                <info-icon v-if="logType == 1" class="svg icon"></info-icon> 
-                <warning-icon v-if="logType == 2" class="svg icon"></warning-icon> 
-                <error-icon v-if="logType == 3" class="svg icon"></error-icon>
-                <stop-icon v-if="logType == 4" class="svg icon"></stop-icon>
-                Zeit
+                <div class="icontext">
+                    <info-icon v-if="logType == 1" class="svg icon"></info-icon> 
+                    <warning-icon v-if="logType == 2" class="svg icon"></warning-icon> 
+                    <error-icon v-if="logType == 3" class="svg icon"></error-icon>
+                    <stop-icon v-if="logType == 4" class="svg icon"></stop-icon>
+                    <span class="col">Zeit</span>
+                </div>
             </template>
             <template v-slot:col1>
-                Kategorie
+                <div class="col">Kategorie</div>
             </template>
             <template v-slot:col2>
-                Ereignis
+                <div class="col">Ereignis</div>
             </template>
 
             <template v-slot=row >
@@ -284,8 +286,18 @@ export default Vue.extend({
     vertical-align: bottom;
 }
 .icon {
+    display: inline;
     margin-right: 3px;
     vertical-align: bottom;
     height: 16px;
 }
+.col {
+    padding-left: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.icontext {
+    display: flex;
+}
+
 </style>

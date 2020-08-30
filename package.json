@@ -26,6 +26,6 @@
 		"@vue/cli-service-global": "^4.2.3"
 	},
 	"dependencies": {
-		"virtual-table-vue": "^4.0.0"
+		"virtual-table-vue": "^5.0.0"
 	}
 }
