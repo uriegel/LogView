@@ -52,7 +52,7 @@ export default Vue.extend({
     --tablevue-selected-color: white;
     --tablevue-selected-background-color: blue;
     --tablevue-columns-separator-color:  white;
-    --tablevue-selected-background-hover-color: #white;
+    --tablevue-selected-background-hover-color: #0063ff;
     --tablevue-tr-selected-color: red;
 }
 body {

@@ -1,12 +1,26 @@
 <template>
     <div class="root" @focus=focus @keydown=keydown>
         <table-view :eventBus="tableEventBus" :columns='columns' :itemsSource='itemsSource'  
-            @selection-changed="onSelectionChanged">
+            @selection-changed="onSelectionChanged" @column-click='onColumn'>
+
+            <template v-slot:col0>
+                <info-icon v-if="logType == 1" class="svg icon"></info-icon> 
+                <warning-icon v-if="logType == 2" class="svg icon"></warning-icon> 
+                <error-icon v-if="logType == 3" class="svg icon"></error-icon>
+                <stop-icon v-if="logType == 4" class="svg icon"></stop-icon>
+                Zeit
+            </template>
+            <template v-slot:col1>
+                Kategorie
+            </template>
+            <template v-slot:col2>
+                Ereignis
+            </template>
+
             <template v-slot=row >
                 <tr :class="{ 'isCurrent': row.item.index == selectedIndex || (selectedIndex == 0 && !row.item.index)}">
                     <td class="icon-name">
-                        <!-- <trace-icon v-if="row.item.msgType == 1" class="svg icon"></trace-icon>  -->
-                        <img src="./trace.svg" v-if="row.item.msgType == 1" class="svg icon">
+                        <trace-icon v-if="row.item.msgType == 1" class="svg icon"></trace-icon> 
                         <info-icon v-if="row.item.msgType == 2" class="svg icon"></info-icon> 
                         <warning-icon v-if="row.item.msgType == 3" class="svg icon"></warning-icon> 
                         <error-icon v-if="row.item.msgType == 4" class="svg icon"></error-icon>
@@ -27,7 +41,7 @@
 <script>
 import Vue from 'vue'
 import NewLineIcon from './icons/NewLineIcon.vue'
-//import TraceIcon from './icons/TraceIcon.vue'
+import TraceIcon from './icons/TraceIcon.vue'
 import InfoIcon from './icons/InfoIcon.vue'
 import WarningIcon from './icons/WarningIcon.vue'
 import ErrorIcon from './icons/ErrorIcon.vue'
@@ -39,7 +53,7 @@ var ws
 export default Vue.extend({
     components: {
         NewLineIcon,
-        //TraceIcon,
+        TraceIcon,
         InfoIcon,
         WarningIcon,
         ErrorIcon,
@@ -70,16 +84,14 @@ export default Vue.extend({
             selectedIndex: 0,
             columns: [
                 {
-                    name: "Zeit",
-                    width: "5em"
+                    width: "5em",
+                    isClickable: true,
                 },
                 {
-                    name: "Kategorie",
-                    width: "3em"
+                    width: "3em",
+                    isClickable: true
                 },
-                {
-                    name: "Ereignis",
-                },
+                {},
             ],
             itemsSource: { 
                 count: 0,
@@ -90,7 +102,8 @@ export default Vue.extend({
             restrictions: [],
             restricted: false,
             selectedLineIndex: -1,
-            refreshMode: false
+            refreshMode: false,
+            logType: 0
         }
     },
     methods: {
@@ -189,7 +202,14 @@ export default Vue.extend({
                     return // exit this handler for other keys
             }
             evt.preventDefault() // prevent
-        },        
+        },      
+        onColumn(index) {
+            if (index == 0) {
+                this.logType++
+                if (this.logType == 5)
+                    this.logType = 0
+            }
+        },  
         getRestricted(item) {
             function getRestricted(itemToRestrict, res) {
                 function* split(str, sep) {
