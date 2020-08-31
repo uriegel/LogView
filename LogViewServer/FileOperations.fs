@@ -6,24 +6,43 @@ open FSharpTools.String
 open System.Globalization
 
 type Line = {
+    Text: string
+    FileIndex: int
     Index: int
-    Pos: int64
-    Length: int
 }
 
 type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) = 
     let encoding = if utf8 then Encoding.UTF8 else Encoding.GetEncoding (CultureInfo.CurrentCulture.TextInfo.ANSICodePage)
     let posType = if formatMilliseconds then 24 else 20
-    let mutable fileLines = File.ReadAllLines path
-    let mutable lines = fileLines
     let mutable restriction: string option = None
     let mutable minimalType = MinimalType.Trace
 
-    let getLines (lineRange: string array) =
+    let stream = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite) 
+    let reader = new StreamReader (stream)
+
+    let readLines () =
+        let mutable run = true
+        seq {
+            while run do
+                let textline = reader.ReadLine ()
+                if not (isNull textline) then
+                    yield textline
+                else 
+                    run <- false
+        }
+        
+    let mutable fileLines = 
+        readLines () 
+        |> Seq.mapi (fun i n -> { Text = n; Index = i; FileIndex = i})
+        |> Seq.toArray
+
+    let mutable lines = fileLines
+
+    let getLines (lineRange: Line array) =
         let timeLength = if formatMilliseconds then 12 else 8
         let textPos = if formatMilliseconds then 29 else 25
         lineRange        
-        |> Seq.mapi (fun i text -> 
+        |> Seq.map (fun line -> 
             let getItemParts text msgType =
                 if msgType <> MsgType.NewLine then 
                     let date = text |> String.substring2 0 10
@@ -39,7 +58,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                     [| ""; ""; text |]
 
             let msgType = 
-                match text |> substring2 posType 5 with
+                match line.Text |> substring2 posType 5 with
                 | "TRACE" -> MsgType.Trace
                 | "INFO " -> MsgType.Info
                 | "WARNI" -> MsgType.Warning
@@ -47,9 +66,9 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 | "FATAL" -> MsgType.Fatal
                 | _ -> MsgType.NewLine
             {
-                Index = i
-                LineIndex = 0 // TODO
-                ItemParts = getItemParts text msgType
+                Index = line.Index
+                LineIndex = line.FileIndex
+                ItemParts = getItemParts line.Text msgType
                 MsgType = msgType
             })
 
@@ -104,9 +123,9 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
         let filter line = 
             let res =  
-                if String.length line > posType + 5 then
+                if String.length line.Text > posType + 5 then
                     types 
-                    |> Seq.map (compareType line)
+                    |> Seq.map (compareType line.Text)
                     |> Seq.tryFind id 
                 else
                     None
@@ -120,6 +139,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
             else
                 fileLines 
                 |> Array.filter filter
+                |> Array.mapi (fun i n -> { FileIndex = n.FileIndex; Index = i; Text = n.Text })
 
     member this.Refresh () = 
         // let recentFileSize = fileSize
