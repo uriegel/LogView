@@ -15,8 +15,8 @@ let initialize (socketSession: Types.Session) =
     //let session = Session ("/home/uwe/LogTest/CaesarProxy.log", false, false)
     //let session = Session ("/home/uwe/LogTest/CaesarProxy2.log", true, false)
     //let session = Session ("/home/uwe/LogTest/klein.log", true, false)
-    //let session = Session (@"C:\ProgramData\caesar\Proxy\log\CaesarProxy.log", true, false)
-    let session = Session (@"C:\users\uwe\desktop\CaesarWebServer.log", false, false)
+    let session = Session (@"C:\ProgramData\caesar\Proxy\log\CaesarProxy.log", true, false)
+    //let session = Session (@"C:\users\uwe\desktop\CaesarWebServer.log", false, false)
     
     sessionHolder <- Some session 
     let onReceive (stream: Stream) = session.OnReceive stream
@@ -24,19 +24,6 @@ let initialize (socketSession: Types.Session) =
     let send = socketSession.Start onReceive onClose << Json.serializeToBuffer
     let func = Action<obj>(send)
     session.Initialize func
-
-
-
-let substring2 pos length (str: string) =
-        match str with
-        | null -> ""
-        | "" -> ""
-        | _ -> 
-            let pos = max 0 pos
-            let pos1 = min pos (str.Length - 1)
-            let length = max 0 length
-            let length1 = min length (str.Length - pos1 - 1)
-            str.Substring (pos1, length1)
 
 let start () = 
     let requests = [ 

@@ -18,9 +18,9 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     let mutable minimalType = MinimalType.Trace
 
     let stream = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite) 
-    let reader = new StreamReader (stream)
+    let reader = new StreamReader (stream, encoding)
 
-    let readLines () =
+    let readLines initialIndex =
         let mutable run = true
         seq {
             while run do
@@ -30,12 +30,10 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 else 
                     run <- false
         }
-        
-    let mutable fileLines = 
-        readLines () 
-        |> Seq.mapi (fun i n -> { Text = n; Index = i; FileIndex = i})
+        |> Seq.mapi (fun i n -> { Text = n; Index = initialIndex + i; FileIndex = initialIndex + i})
         |> Seq.toArray
-
+        
+    let mutable fileLines = readLines 0 
     let mutable lines = fileLines
 
     let getLines (lineRange: Line array) =
@@ -71,6 +69,36 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 ItemParts = getItemParts line.Text msgType
                 MsgType = msgType
             })
+
+    let restrictMinimalType linesToRestrict = 
+        let types = 
+            match minimalType with 
+            | MinimalType.Info -> [| "INFO "; "WARNI"; "ERRRO"; "FATAL" |]
+            | MinimalType.Warning -> [| "WARNI"; "ERRRO"; "FATAL" |]
+            | MinimalType.Error -> [| "ERRRO"; "FATAL" |]
+            | MinimalType.Fatal -> [| "FATAL" |]
+            | _ -> [| |]
+
+        let compareType line typ = line |> String.substring2 posType 5 = typ
+
+        let filter line = 
+            let res =  
+                if String.length line.Text > posType + 5 then
+                    types 
+                    |> Seq.map (compareType line.Text)
+                    |> Seq.tryFind id 
+                else
+                    None
+            match res with
+                    | Some true -> true
+                    | _ -> false
+
+        if minimalType = MinimalType.Trace then
+            linesToRestrict
+        else
+            linesToRestrict
+            |> Array.filter filter
+            |> Array.mapi (fun i n -> { FileIndex = n.FileIndex; Index = i; Text = n.Text })
 
     member this.LineCount = lines.Length 
 
@@ -108,57 +136,17 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     member this.SetMinimalType newMinimalType = 
         minimalType <- newMinimalType
         
-        let types = 
-            match minimalType with 
-            | MinimalType.Info -> [| "INFO "; "WARNI"; "ERRRO"; "FATAL" |]
-            | MinimalType.Warning -> [| "WARNI"; "ERRRO"; "FATAL" |]
-            | MinimalType.Error -> [| "ERRRO"; "FATAL" |]
-            | MinimalType.Fatal -> [| "FATAL" |]
-            | _ -> [| |]
-
-        //let compareType line typ = line |> String.substring2 posType 5 = typ
-        let compareType line typ = 
-            let affe = line |> String.substring2 posType 5
-            affe = typ
-
-        let filter line = 
-            let res =  
-                if String.length line.Text > posType + 5 then
-                    types 
-                    |> Seq.map (compareType line.Text)
-                    |> Seq.tryFind id 
-                else
-                    None
-            match res with
-                    | Some true -> true
-                    | _ -> false
-
-        lines <- 
-            if minimalType = MinimalType.Trace then
-                fileLines
-            else
-                fileLines 
-                |> Array.filter filter
-                |> Array.mapi (fun i n -> { FileIndex = n.FileIndex; Index = i; Text = n.Text })
+        lines <- restrictMinimalType fileLines
 
     member this.Refresh () = 
-        // let recentFileSize = fileSize
-        // fileSize <- file.Length
-        // if recentFileSize < fileSize then
-        //     file.Position <- recentFileSize
-        //     let newLines =
-        //         file 
-        //         |> createLogIndexes
-        //         |> Seq.toArray
-        //     if newLines.Length > 0 then
-        //         lineIndexes <- 
-        //             [| lineIndexes; newLines |] 
-        //             |> Seq.concat 
-        //             |> Seq.toArray
-        //         lineIndexes.Length
-        //     else
-        //         0
-        // else
+        let newLines = readLines fileLines.Length
+        if newLines.Length > 0 then
+            fileLines <- Array.concat [| fileLines; newLines |]
+            
+            lines <- restrictMinimalType fileLines
+            
+            lines.Length
+        else
             0
 
     member this.GetLines startIndex endIndex = 

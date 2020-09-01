@@ -2,6 +2,7 @@ namespace ULogViewServer
 open System
 open System.Text
 open FSharpTools
+open System.Threading
 
 type GetItems = {
     ReqId: int
@@ -29,6 +30,7 @@ type Message =
     | SetMinimalType of SetMinimalType
 
 type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) = 
+    let locker = obj()
     let fileOperations = FileOperations (logFilePath, formatMilliseconds, utf8)
     // TODO: LateInit
     let mutable send: Action<obj> = Action<obj>(ignore)
@@ -46,11 +48,15 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
     let timer = new System.Timers.Timer 500.0
     
     let refresh () =
-        try 
-            let lines = fileOperations.Refresh ()
-            if lines <> 0 then
-                send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
-        with _ -> ()
+        if Monitor.TryEnter (locker, TimeSpan.FromMilliseconds 0.0) then
+            try 
+                try 
+                    let lines = fileOperations.Refresh ()
+                    if lines <> 0 then
+                        send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = lines - 1 |} 
+                with _ -> ()
+            finally
+                Monitor.Exit locker
     
     let onReceive msg =
         match msg with
