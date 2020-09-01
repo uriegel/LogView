@@ -62,16 +62,25 @@ type Session(logFilePath: string, formatMilliseconds: bool, utf8: bool) =
         match msg with
         | GetItems getItems -> getItemsQueue.Post getItems   
         | SetRestriction setRestriction ->
-            timer.Enabled <- false
-            let selectedIndex = fileOperations.SetRestrict setRestriction.Restriction setRestriction.SelectedIndex
-            let lines = fileOperations.LineCount
-            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = selectedIndex |} 
+            Monitor.Enter locker
+            try 
+                timer.Enabled <- false
+                let selectedIndex = fileOperations.SetRestrict setRestriction.Restriction setRestriction.SelectedIndex
+                let lines = fileOperations.LineCount
+                send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = selectedIndex |} 
+            finally
+                Monitor.Exit locker
         | SetRefreshMode setRefreshMode -> 
             timer.Enabled <- setRefreshMode.Value
         | SetMinimalType setMinimalType ->
-            fileOperations.SetMinimalType setMinimalType.MinimalType
-            let lines = fileOperations.LineCount
-            send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = 0 |} 
+            Monitor.Enter locker
+            try 
+                timer.Enabled <- false
+                fileOperations.SetMinimalType setMinimalType.MinimalType
+                let lines = fileOperations.LineCount
+                send.Invoke {| Method = Method.ItemsSource; Count = lines; IndexToSelect = 0 |} 
+            finally
+                Monitor.Exit locker
 
     let timerHandler = Timers.ElapsedEventHandler(fun _ __ -> refresh ())
 
