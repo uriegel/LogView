@@ -73,9 +73,9 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     let restrictMinimalType linesToRestrict = 
         let types = 
             match minimalType with 
-            | MinimalType.Info -> [| "INFO "; "WARNI"; "ERRRO"; "FATAL" |]
-            | MinimalType.Warning -> [| "WARNI"; "ERRRO"; "FATAL" |]
-            | MinimalType.Error -> [| "ERRRO"; "FATAL" |]
+            | MinimalType.Info -> [| "INFO "; "WARNI"; "ERROR"; "FATAL" |]
+            | MinimalType.Warning -> [| "WARNI"; "ERROR"; "FATAL" |]
+            | MinimalType.Error -> [| "ERROR"; "FATAL" |]
             | MinimalType.Fatal -> [| "FATAL" |]
             | _ -> [| |]
 
