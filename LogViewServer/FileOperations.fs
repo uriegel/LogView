@@ -4,6 +4,7 @@ open System.Text
 open FSharpTools
 open FSharpTools.String
 open System.Globalization
+open System
 
 type Line = {
     Text: string
@@ -70,6 +71,37 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                 MsgType = msgType
             })
 
+    let restrict linesToRestrict (restriction: string option) =
+        let orRestrictions = 
+            match restriction with
+            | Some restriction -> Some <| restriction.Split ("||", StringSplitOptions.RemoveEmptyEntries) 
+            | None -> None
+
+        let filter (orRestrictions: string array) line = 
+            let filter (restriction: string) = 
+                let andRestrictions = 
+                    restriction.Split ("&&", StringSplitOptions.RemoveEmptyEntries) 
+
+                let filter restriction = 
+                    String.indexOfCompare line (restriction StringComparison.OrdinalIgnoreCase) 
+                    // | None -> false
+                    // | _ -> true
+
+
+                andRestrictions
+                |> Array.exists filter
+            
+            orRestrictions
+            |> Seq.exists filter
+
+        match orRestrictions with
+        | Some restrictions -> 
+            linesToRestrict
+            |> Array.filter (filter restrictions)
+            |> Array.mapi (fun i n -> { FileIndex = n.FileIndex; Index = i; Text = n.Text })
+        | None -> linesToRestrict
+          
+
     let restrictMinimalType linesToRestrict = 
         let types = 
             match minimalType with 
@@ -108,6 +140,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
     member this.SetRestrict restriction indexToSelect = 
         this.Restriction <- restriction
+
         1
         // fileSize <- file.Length
         // file.Position <- 0L
