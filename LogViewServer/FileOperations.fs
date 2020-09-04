@@ -74,7 +74,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     let restrict linesToRestrict (restriction: string option) =
         let orRestrictions = 
             match restriction with
-            | Some restriction -> Some <| restriction.Split ("||", StringSplitOptions.RemoveEmptyEntries) 
+            | Some restriction -> Some <| restriction.Split ("OR", StringSplitOptions.RemoveEmptyEntries) 
             | None -> None
 
         let filter (orRestrictions: string array) line = 
@@ -83,13 +83,12 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
                     restriction.Split ("&&", StringSplitOptions.RemoveEmptyEntries) 
 
                 let filter restriction = 
-                    String.indexOfCompare line (restriction StringComparison.OrdinalIgnoreCase) 
-                    // | None -> false
-                    // | _ -> true
-
+                    match line.Text |> String.indexOfCompare restriction StringComparison.OrdinalIgnoreCase with
+                    | None -> true
+                    | _ -> false
 
                 andRestrictions
-                |> Array.exists filter
+                |> Array.exists filter |> not
             
             orRestrictions
             |> Seq.exists filter
@@ -101,7 +100,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
             |> Array.mapi (fun i n -> { FileIndex = n.FileIndex; Index = i; Text = n.Text })
         | None -> linesToRestrict
           
-
     let restrictMinimalType linesToRestrict = 
         let types = 
             match minimalType with 
@@ -140,8 +138,12 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
     member this.SetRestrict restriction indexToSelect = 
         this.Restriction <- restriction
+        
+        
 
-        1
+        
+        lines <- restrict fileLines restriction
+        lines.Length
         // fileSize <- file.Length
         // file.Position <- 0L
         // lineIndexes <-
@@ -190,4 +192,5 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         getLines range
         |> Seq.toArray
         
-
+    // TODO: Restriction: take typeRestriction
+    // TODO: Restriction: F9: select the right item

@@ -30,6 +30,6 @@
   </ItemGroup>
     
   <ItemGroup>
-    <PackageReference Include="FSharpTools" Version="3.0.3" />
+    <PackageReference Include="FSharpTools" Version="4.0.0" />
   </ItemGroup>
 </Project>
