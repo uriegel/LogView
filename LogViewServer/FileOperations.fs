@@ -174,8 +174,8 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         let newLines = readLines fileLines.Length
         if newLines.Length > 0 then
             fileLines <- Array.concat [| fileLines; newLines |]
-            
-            lines <- restrictMinimalType fileLines
+            typedLines <- restrictMinimalType fileLines
+            lines <- restrict typedLines restriction
             
             lines.Length
         else
@@ -189,6 +189,5 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         getLines range
         |> Seq.toArray
         
-    // TODO: Restriction: auto refresh mode with type and restriction
     // TODO: Restriction: F9: select the right item
     // TODO: Restriction: Categories
