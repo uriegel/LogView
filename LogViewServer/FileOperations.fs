@@ -74,13 +74,13 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     let restrict linesToRestrict (restriction: string option) =
         let orRestrictions = 
             match restriction with
-            | Some restriction -> Some <| restriction.Split ("OR", StringSplitOptions.RemoveEmptyEntries) 
+            | Some restriction -> Some <| restriction.Split (" OR ", StringSplitOptions.RemoveEmptyEntries) 
             | None -> None
 
         let filter (orRestrictions: string array) line = 
             let filter (restriction: string) = 
                 let andRestrictions = 
-                    restriction.Split ("&&", StringSplitOptions.RemoveEmptyEntries) 
+                    restriction.Split (" && ", StringSplitOptions.RemoveEmptyEntries) 
 
                 let filter restriction = 
                     match line.Text |> String.indexOfCompare restriction StringComparison.OrdinalIgnoreCase with

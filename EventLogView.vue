@@ -193,8 +193,9 @@ export default Vue.extend({
                     }
                     ws.send(JSON.stringify(msg))
 
-                    this.restrictions = this.restriction
-                        ? this.restriction.split("|")
+                    this.restrictions = 
+                        this.restriction
+                        ? this.restriction.split(" OR ").map(n => n.split(" && ")).flat()
                         : []
 
                     this.focus()
