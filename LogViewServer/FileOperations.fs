@@ -35,7 +35,8 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         |> Seq.toArray
         
     let mutable fileLines = readLines 0 
-    let mutable lines = fileLines
+    let mutable typedLines = fileLines
+    let mutable lines = typedLines
 
     let getLines (lineRange: Line array) =
         let timeLength = if formatMilliseconds then 12 else 8
@@ -138,11 +139,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
     member this.SetRestrict restriction indexToSelect = 
         this.Restriction <- restriction
-        
-        
-
-        
-        lines <- restrict fileLines restriction
+        lines <- restrict typedLines restriction
         lines.Length
         // fileSize <- file.Length
         // file.Position <- 0L
@@ -170,8 +167,8 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
 
     member this.SetMinimalType newMinimalType = 
         minimalType <- newMinimalType
-        
-        lines <- restrictMinimalType fileLines
+        typedLines <- restrictMinimalType fileLines
+        lines <- restrict typedLines restriction
 
     member this.Refresh () = 
         let newLines = readLines fileLines.Length
@@ -192,5 +189,6 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         getLines range
         |> Seq.toArray
         
-    // TODO: Restriction: take typeRestriction
+    // TODO: Restriction: auto refresh mode with type and restriction
     // TODO: Restriction: F9: select the right item
+    // TODO: Restriction: Categories
