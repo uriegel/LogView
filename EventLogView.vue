@@ -221,21 +221,42 @@ export default Vue.extend({
         },  
         getRestricted(item) {
             function getRestricted(itemToRestrict, res) {
-                function* split(str, sep) {
-                    const seplen = sep.length
-                    let pos = 0
+                const seplen = res.length
+
+                // get next not highlighted part, and highlighted part
+                function* getParts() {
+                    let index = 0
                     while (true) {
-                        const index = itemToRestrict.item.indexOf(res, pos)
-                        yield itemToRestrict.item.substr(pos, index - pos >= 0 ? index - pos : undefined) 
-                        pos = index + seplen
-                        if (index == -1)
-                            break
+                        const pos = itemToRestrict.item.toLowerCase().indexOf(res.toLowerCase(), index)
+                        yield pos != -1
+                            ? { 
+                                item: itemToRestrict.item.substr(index, pos - index), 
+                                sep: itemToRestrict.item.substr(pos - index, seplen) 
+                            }
+                            : { 
+                                item: itemToRestrict.item.substr(index), 
+                                sep: "" 
+                            }
+                        if (pos == -1)
+                            break                            
+                        index = pos + seplen
                     }
                 }
-                const parts = Array.from(split(itemToRestrict.item, res))
+
+                function getHighlighted() {
+                    let result = ""
+                    const parts = Array.from(getParts())
+                    parts.forEach(n => {
+                        result += n.item
+                        if (n.sep.length > 0)
+                            result += `<span class='event-log-vue-selected${itemToRestrict.index}'>${n.sep}</span>`
+                    })
+                    return result;
+                }
+
                 return { 
-                    item: parts.join(`<span class='event-log-vue-selected${itemToRestrict.index}'>${res}</span>`), 
-                    index: itemToRestrict.index <= 2 ? itemToRestrict.index + 1 : 3
+                    item: getHighlighted(), 
+                    index: itemToRestrict.index <= 3 ? itemToRestrict.index + 1 : 4
                 }
             }
             
@@ -267,6 +288,10 @@ export default Vue.extend({
 }
 .event-log-vue-selected3 {
     background-color: green;
+    color: white;
+}
+.event-log-vue-selected4 {
+    background-color: blue;
     color: white;
 }
 </style> 
