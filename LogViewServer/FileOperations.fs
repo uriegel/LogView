@@ -184,5 +184,4 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         getLines range
         |> Seq.toArray
         
-    // TODO: Restriction: F9: select the right item
     // TODO: Restriction: Categories
