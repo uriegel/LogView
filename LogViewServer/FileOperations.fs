@@ -140,30 +140,25 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
     member this.SetRestrict restriction indexToSelect = 
         this.Restriction <- restriction
         lines <- restrict typedLines restriction
-        lines.Length
-        // fileSize <- file.Length
-        // file.Position <- 0L
-        // lineIndexes <-
-        //     file
-        //     |> createLogIndexes 
-        // match indexToSelect, restriction with
-        // | None, _ -> 0
-        // | Some index, None -> index    
-        // | Some index, Some _ -> 
-        //     match lineIndexes |> Array.tryFindIndex (fun n -> n.Index = index) with
-        //     | Some value -> value
-        //     | None -> 
-        //         let sel = lineIndexes |> Array.tryFindIndex (fun n -> n.Index > index)
-        //         match sel with
-        //         | Some 0 -> 0
-        //         | Some sel -> 
-        //             let first = lineIndexes.[sel-1]
-        //             let sec = lineIndexes.[sel]
-        //             if index - first.Index < sec.Index - index then
-        //                 sel - 1
-        //             else
-        //                 sel
-        //         | None -> lineIndexes.Length - 1
+        
+        match indexToSelect, restriction with
+        | None, _ -> 0
+        | Some index, None -> index
+        | Some index, Some _ -> 
+            match lines |> Array.tryFindIndex (fun n -> n.FileIndex = index) with
+            | Some value -> value
+            | None -> 
+                let sel = lines |> Array.tryFindIndex (fun n -> n.FileIndex > index)
+                match sel with
+                | Some 0 -> 0
+                | Some sel -> 
+                    let first = lines.[sel-1].FileIndex
+                    let sec = lines.[sel].FileIndex
+                    if index - first < sec - index then
+                        sel - 1
+                    else
+                        sel
+                | None -> lines.Length
 
     member this.SetMinimalType newMinimalType = 
         minimalType <- newMinimalType
