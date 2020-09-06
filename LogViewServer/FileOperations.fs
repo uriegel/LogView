@@ -129,7 +129,7 @@ type FileOperations(path: string, formatMilliseconds: bool, utf8: bool) =
         else
             linesToRestrict
             |> Array.filter filter
-            |> Array.mapi (fun i n -> { FileIndex = n.FileIndex; Index = i; Text = n.Text })
+            |> Array.mapi (fun i n -> { FileIndex = i; Index = i; Text = n.Text })
 
     member this.LineCount = lines.Length 
 
