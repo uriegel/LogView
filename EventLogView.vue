@@ -21,7 +21,7 @@
 
             <template v-slot=row >
                 <tr :class="{ 'isCurrent': row.item.index == selectedIndex || (selectedIndex == 0 && !row.item.index)}">
-                    <td class="icon-name">
+                    <td class="selectable icon-name">
                         <trace-icon v-if="row.item.msgType == 1" class="svg icon"></trace-icon> 
                         <info-icon v-if="row.item.msgType == 2" class="svg icon"></info-icon> 
                         <warning-icon v-if="row.item.msgType == 3" class="svg icon"></warning-icon> 
@@ -30,9 +30,9 @@
                         <new-line-icon v-if="row.item.msgType == 6" class="svg icon"></new-line-icon> 
                         {{row.item.itemParts[0]}}
                     </td>
-                    <td>{{row.item.itemParts[1]}}</td>
-                    <td v-if="restrictions" v-html="getRestricted(row.item.itemParts[2])"></td>
-                    <td v-if="!restrictions">{{row.item.itemParts[2]}}</td>  
+                    <td class="selectable">{{row.item.itemParts[1]}}</td>
+                    <td class="selectable" v-if="restrictions" v-html="getRestricted(row.item.itemParts[2])"></td>
+                    <td class="selectable" v-if="!restrictions">{{row.item.itemParts[2]}}</td>  
                 </tr>
             </template>
         </table-view>
@@ -329,6 +329,9 @@ export default Vue.extend({
 }
 .icontext {
     display: flex;
+}
+.selectable {
+    user-select: text;
 }
 
 </style>
