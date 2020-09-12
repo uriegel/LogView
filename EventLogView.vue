@@ -31,8 +31,8 @@
                         {{row.item.itemParts[0]}}
                     </td>
                     <td class="selectable">{{row.item.itemParts[1]}}</td>
-                    <td class="selectable" v-if="restrictions" v-html="getRestricted(row.item.itemParts[2])"></td>
-                    <td class="selectable" v-if="!restrictions">{{row.item.itemParts[2]}}</td>  
+                    <td class="selectable" v-bind:title="row.item.itemParts[2]" v-if="restrictions" v-html="getRestricted(row.item.itemParts[2])"></td>
+                    <td class="selectable" v-bind:title="row.item.itemParts[2]" v-if="!restrictions">{{row.item.itemParts[2]}}</td>  
                 </tr>
             </template>
         </table-view>
